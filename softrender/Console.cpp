@@ -55,9 +55,9 @@ int Game_Main()
 	
 	StartClock();
 
-#define  FRACBITS 16
+//#define  FRACBITS 16
 
-	float f=7.75f;
+	float f=-700.12345f;
 	int fix_value = float_to_fixpoint(f,FRACBITS);
 	float converted_value = fixpoint_to_float(fix_value,FRACBITS);
 

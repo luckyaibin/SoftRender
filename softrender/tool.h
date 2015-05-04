@@ -3,34 +3,24 @@
 int float_to_fixpoint(float fval,int fracbits)
 {
 	int ival = *(int *)&fval;
-	unsigned int ui = 19;
-	int i=20;
-	printf("%d",ui-i);
-	// 提取尾数
-	// 注意实际的尾数前面还有一个被省略掉的1
+	// 提取尾数,注意实际的尾数前面还有一个被省略掉的1
 	int mantissa = (ival & 0x007fffff) | 0x800000;
-
 	// 提取指数,以23分界
 	int exponent =  (ival >> 23) & 0xff;
 	exponent = exponent - 127;//得到真正的指数值
-
 	if ( (fracbits+exponent) < 23)
 		mantissa = mantissa>>( 23 - (fracbits+exponent));
 	else
-		mantissa = mantissa<<( 23 - (fracbits+exponent));
+		mantissa = mantissa<<(  (fracbits+exponent) - 23);
 	// 如果小于0，则将结果取反
 	if ((*(int *)&fval) & 0x80000000)
-		ival = -ival;
-
+		mantissa = -mantissa;
 	//int vvv = fval * (1<<fracbits);
-
-	return ival;
+	return mantissa;
 }
 //把定点数转换成浮点数
 float fixpoint_to_float(int i,int fractbits)
 {
-	float ff=7.75f;
-	int *pp = (int*)&ff;
 	float f;
 	int *p = (int*)&f;
 	*p=0;
@@ -44,11 +34,8 @@ float fixpoint_to_float(int i,int fractbits)
 	int highest_bit_pos = 31;
 	while (!((1<<highest_bit_pos) & i))
 		highest_bit_pos--;
-
 	int exponent = highest_bit_pos-fractbits;
-
 	exponent = exponent + 127;
-
 	//去掉最高位的1
 	int mantissa = (i & (  ~(1<<highest_bit_pos) ));
 	//再把最高位右边那个bit移位到第23个bit的位置,对齐
@@ -56,15 +43,11 @@ float fixpoint_to_float(int i,int fractbits)
 		mantissa = mantissa << (22 - (highest_bit_pos - 1));
 	else
 		mantissa = mantissa >> ( (highest_bit_pos-1) - 22 );
-
 	*p = exponent;
 	*p = (*p << 23);
 	*p = (*p)|mantissa;
 	if (is_negative)
-	{
 		*p = -*p;
-	}
-
 	return f;
 }
 //把定点数转换成浮点数
@@ -81,15 +64,12 @@ float fixpoint_to_float2(int i,int fractbits)
 		is_negative = 1;
 		i=-i;
 	}
-	i = i >> fractbits;
 	//最高位bit所在位置
 	int highest_bit_pos = 31;
 	while (!((1<<highest_bit_pos) & i))
 		highest_bit_pos--;
-
-	int exponent = highest_bit_pos-24;
+	int exponent = highest_bit_pos-fractbits;
 	exponent = exponent + 127;
-
 	//去掉最高位的1
 	int mantissa = (i & (  ~(1<<highest_bit_pos) ));
 	//再移位到第23个bit的位置,对齐
@@ -101,9 +81,6 @@ float fixpoint_to_float2(int i,int fractbits)
 	*p = (*p << 23);
 	*p = (*p)|mantissa;
 	if (is_negative)
-	{
 		*p = -*p;
-	}
-	
 	return f;
 }

@@ -236,7 +236,33 @@ r(x,y) = 【y0*(r2 - r1) + y1*(r0 - r2) + y2*(r1 - r0)】*x - 【x0*(r2 - r1) + x1*
 		  (x0*y1 - x1*y0) + (x1*y2 - x2*y1) + (x2*y0 - x0*y2);
 
 		上面有推导出来的三角形的面积  area = [(x0*y1 - x1*y0) + (x1*y2-x2*y1) + (x2*y0 - x0*y2) ]/2
-  */
+
+
+更简单的推导
+A*x0 + B*y0 + C = z0
+A*x1 + B*y1 + C = z1
+A*x2 + B*y2 + C = z2
+
+i substract 2 and 3 row from 1
+
+A*(x0-x1) + B*(y0-y1) = z0-z1
+A*(x0-x2) + B*(y0-y2) = z0-z2
+
+now
+
+let P=x0-x1 Q=y0-y1
+R=x0-x2 S=y0-y2
+T=z0-z1 U=z0-z2
+
+A*P+B*Q=T
+A*R+B*S=U
+
+det=P*S-R*Q
+idet=1/det
+A=(T*S-U*Q)*idet
+B=(P*U-R*T)*idet
+C=z0-A*x0-B*x0
+ */
 
 ARGB interpolate_color_triangle(int x,int y,vertex2d v0,vertex2d v1,vertex2d v2)
 {
