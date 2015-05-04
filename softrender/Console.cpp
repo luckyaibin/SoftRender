@@ -57,24 +57,31 @@ int Game_Main()
 
 //#define  FRACBITS 16
 
-	float f=-700.12345f;
-	int fix_value = float_to_fixpoint(f,FRACBITS);
-	float converted_value = fixpoint_to_float(fix_value,FRACBITS);
+	float f=700.12345f;
+	float g = 9.43f;
+	int ff = float_to_fixpoint(f,FRACBITS);
+	int fg = float_to_fixpoint(g,FRACBITS);
+
+	int f_diviedby_g = float(ff) / (fg>>FRACBITS);
+	float converted_value = fixpoint_to_float(f_diviedby_g,FRACBITS);
+
+	float real_res = f/g;
+
 
 	/*if (g_drawed%3==0)
 	{
-		vertex2d v1,v2,v3;
-		v1.x = 100;
-		v1.y = 100;
-		v1.color=ARGB(0,255,0,0);
-		v2.x = 300;
-		v2.y = 100;
-		v2.color=ARGB(0,0,255,0);
-		v3.x = 100;
-		v3.y = 300;
-		v3.color=ARGB(0,0,0,255);
+	vertex2d v1,v2,v3;
+	v1.x = 100;
+	v1.y = 100;
+	v1.color=ARGB(0,255,0,0);
+	v2.x = 300;
+	v2.y = 100;
+	v2.color=ARGB(0,0,255,0);
+	v3.x = 100;
+	v3.y = 300;
+	v3.color=ARGB(0,0,0,255);
 
-		DrawTriangleWithEdgeEquation(v1,v2,v3,ARGB(0,255,0,0));
+	DrawTriangleWithEdgeEquation(v1,v2,v3,ARGB(0,255,0,0));
 	}*/
 	
 	if (g_drawed%3==1)
@@ -109,7 +116,7 @@ int Game_Main()
 		DrawTriangleWithEdgeEquation(v111,v222,v333,ARGB(0,255,0,0));
 	}
 	
-	 g_drawed;
+	 g_drawed++;
 	//DrawTriangleWithEdgeEquation
 	for(int i=0;i<1000;i++)
 	{

@@ -82,7 +82,7 @@ struct interpolate_eqn{
 	int interpolation_blue_b;
 	int interpolation_blue_c;
 
-	int interpolate_argb_divider;
+	float interpolate_argb_divider_reciprocal;
 };
 //初始化差值方程
 void init_interpolate_eqn(struct interpolate_eqn * inter, vertex2d v0,vertex2d v1,vertex2d v2);
