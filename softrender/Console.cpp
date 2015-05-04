@@ -2,13 +2,13 @@
 #include "vector.h"
 #include <Windows.h>
 #include <iostream>
-
+#include "tool.h"
 
 
 
 //宏定义
 #define WINDOW_CLASS_NAME TEXT("CPPYIN3DWNDCLS")
-#define WINDOW_TITLE TEXT("CPPYIN3DCONSOLE")
+#define WINDOW_TITLE TEXT("engine")
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 #define SCREEN_BPP 32
@@ -55,51 +55,91 @@ int Game_Main()
 	
 	StartClock();
 
-	// 画图
-	/*for (int x = 0; x < 200; ++x)
+#define  FRACBITS 16
+
+	float f=7.75f;
+	int fix_value = float_to_fixpoint(f,FRACBITS);
+	float converted_value = fixpoint_to_float(fix_value,FRACBITS);
+
+	/*if (g_drawed%3==0)
 	{
-	for (int y = 0; y < 200; ++y)
-	{
-	DrawPixel(x, y, ARGB(0, x*y%255, x*y%255, x*y%255));
-	}
+		vertex2d v1,v2,v3;
+		v1.x = 100;
+		v1.y = 100;
+		v1.color=ARGB(0,255,0,0);
+		v2.x = 300;
+		v2.y = 100;
+		v2.color=ARGB(0,0,255,0);
+		v3.x = 100;
+		v3.y = 300;
+		v3.color=ARGB(0,0,0,255);
+
+		DrawTriangleWithEdgeEquation(v1,v2,v3,ARGB(0,255,0,0));
 	}*/
-	int sx = rand() % 300 + 100;
-	int sy = rand() % 300 + 100;
-	int ex = rand() % 300 + 100;
-	int ey = rand() % 300 + 100;
-	//DrawPixel(43, 613, ARGB(0,255,0,0));
-	printf("圆心坐标sx,sy:%d,%d\n",sx,sy);
-	if(!g_drawed)
+	
+	if (g_drawed%3==1)
 	{
-		g_drawed = 1;
-		DrawCircle(400,400,150,ARGB(0,0,255,0));
+		vertex2d v11,v22,v33;
+		v11.x = 400;
+		v11.y = 200;
+		v11.color=ARGB(0,255,0,0);
+		v22.x = 200;
+		v22.y = 200;
+		v22.color=ARGB(0,0,255,0);
+		v33.x = 200;
+		v33.y = 400;
+		v33.color=ARGB(0,0,0,255);
+
+		DrawTriangleWithEdgeEquation(v11,v22,v33,ARGB(0,255,0,0));
 	}
+	
+	if (g_drawed%3==2)
+	{
+		vertex2d v111,v222,v333;
+		v111.x = 300;
+		v111.y = 500;
+		v111.color=ARGB(0,255,0,0);
+		v222.x = 500;
+		v222.y = 300;
+		v222.color=ARGB(0,0,255,0);
+		v333.x = 300;
+		v333.y = 300;
+		v333.color=ARGB(0,0,0,255);
 
-	vertex2d v1,v2,v3;
-	v1.x = 0;
-	v1.y = 0;
-	v2.x = 200;
-	v2.y = 0;
-	v3.x = 100;
-	v3.y = 100;
-
-
-	DrawTriangleWithEdgeEquation(v1,v2,v3,ARGB(0,255,0,0));
+		DrawTriangleWithEdgeEquation(v111,v222,v333,ARGB(0,255,0,0));
+	}
+	
+	 g_drawed;
 	//DrawTriangleWithEdgeEquation
 	for(int i=0;i<1000;i++)
 	{
-		vertex2d p;
-		p.x = rand()%500;
-		p.y = rand()%500;
+		vertex2d v1,v2,v3;
+		 int a = rand()%255;
+		 int r = rand()%255;
+		 int g = rand()%255;
+		 int b = rand()%255;
+		v1.x = rand() % 400;
+		v1.y = rand() % 400;
+		v1.color = ARGB(a,255,0,0);
 
-		/*if (!is_point_in_triangle_by_crossproduct(p,v1,v2,v3))
-		{
-		DrawPixel(p.x,p.y,ARGB(255,0,255,0));
-		}*/
-		if (is_point_in_triangle_by_barycentric_algo(p,v1,v2,v3))
-		{
-			DrawPixel(p.x,p.y,ARGB(255,0,255,0));
-		}
+		a = rand()%255;
+		r = rand()%255;
+		g = rand()%255;
+		b = rand()%255;
+		v2.x = rand() % 400;
+		v2.y = rand() % 400;
+		v2.color = ARGB(a,0,255,0);
+		a = rand()%255;
+		r = rand()%255;
+		g = rand()%255;
+		b = rand()%255;
+		v3.x = rand() % 400;
+		v3.y = rand() % 400;
+		v3.color = ARGB(a,0,0,255);
+
+		DrawTriangleWithEdgeEquation(v1,v2,v3,ARGB(0,rand()% 255,rand()%255,rand()%255));
+		// DrawTriangle(v1,v2,v3,ARGB(0,rand()% 255,rand()%255,rand()%255));
+		// drawTriangle(v1,v2,v3,ARGB(0,rand()% 255,rand()%255,rand()%255));
 	}
 
 	// 输出

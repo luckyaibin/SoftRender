@@ -9,6 +9,7 @@
 	#define MACRO_MAX3(a,b,c) ( ( (a)>(b) )?( (a)>(c)?(a):(c) ):( (b)>(c)?(b):(c) ) )
 #endif
 
+#define FRACBITS 12
 #define epsilon 0.000001f
 #define equal_zero(f) ( (f) < epsilon && (f)> -epsilon )
 typedef unsigned int ARGB;

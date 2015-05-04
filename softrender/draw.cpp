@@ -73,7 +73,7 @@ int DrawPixel(int x,int y, ARGB color)
 //不需要浮点数的Bresenham 算法
 void DrawLine(int x0,int y0,int x1,int y1,ARGB color)
 {
-	printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
+	//printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
 	int steep = abs(y1-y0) > abs(x1-x0);
 	if(steep)//如果斜率绝对值大于1，交换x和y，变成斜率绝对值小于1的
 	{
@@ -86,7 +86,7 @@ void DrawLine(int x0,int y0,int x1,int y1,ARGB color)
 		MACRO_SWAP(y0,y1,int);
 	}
 
-	printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
+	//printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
 	int deltax =  x1 - x0;
 	int deltay =  y1 - y0;
 	int error = 0;
@@ -200,7 +200,7 @@ top triangle:
 	  ------
 P1(x1,y1)  P2(x2,y2)
   */
-int DrawTriangle(const vertex2d& v1, const vertex2d& v2,const vertex2d& v3)
+int DrawTriangle(  vertex2d v1,   vertex2d v2,  vertex2d v3,ARGB color)
 {
 	float x1 = v1.x;
 	float y1 = v1.y;
@@ -221,7 +221,7 @@ int DrawTriangle(const vertex2d& v1, const vertex2d& v2,const vertex2d& v3)
 			// When all half-space functions positive, pixel is in triangle
 			if((x1 - x2) * (y - y1) - (y1 - y2) * (x - x1) > 0 &&  (x2 - x3) * (y - y2) - (y2 - y3) * (x - x2) > 0 && (x3 - x1) * (y - y3) - (y3 - y1) * (x - x3) > 0)
 			{
-				DrawPixel(x,y,ARGB(255,255,255,255));
+				DrawPixel(x,y,color);
 			}
 		}
 	}

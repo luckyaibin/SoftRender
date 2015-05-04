@@ -1,6 +1,5 @@
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
-#include "draw.h"
 #include "vector.h"
 #include "comm_headers.h"
 
@@ -65,10 +64,33 @@ struct edge_eqn{
 	int flag;
 };
 
+//差值方程color(x,y) = A*x + B*y + C
+struct interpolate_eqn{
+	int interpolation_alpha_a;
+	int interpolation_alpha_b;
+	int interpolation_alpha_c;
+
+	int interpolation_red_a;
+	int interpolation_red_b;
+	int interpolation_red_c;
+
+	int interpolation_greed_a;
+	int interpolation_greed_b;
+	int interpolation_greed_c;
+
+	int interpolation_blue_a;
+	int interpolation_blue_b;
+	int interpolation_blue_c;
+
+	int interpolate_argb_divider;
+};
+//初始化差值方程
+void init_interpolate_eqn(struct interpolate_eqn * inter, vertex2d v0,vertex2d v1,vertex2d v2);
 void init_edge_eqn(struct edge_eqn *edge,vertex2d v0,vertex2d v1);
 
 void flip_edge_eqn(struct edge_eqn *edge);
 int evaluate_edge(struct edge_eqn * edge,int x,int y);
 
 void DrawTriangleWithEdgeEquation(vertex2d v0,vertex2d v1,vertex2d v2,ARGB color);
+ARGB interpolate_color_triangle(int x,int y,vertex2d v0,vertex2d v1,vertex2d v2);
 #endif
