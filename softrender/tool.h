@@ -1,4 +1,5 @@
-
+#ifndef __TOOL_H__
+#define __TOOL_H__
 //把浮点数转换成定点数，不通过*(1<<fracbits)的方式，只通过移位操作。fracbits是定点数偏移
 int float_to_fixpoint(float fval,int fracbits)
 {
@@ -84,3 +85,5 @@ float fixpoint_to_float2(int i,int fractbits)
 		*p = -*p;
 	return f;
 }
+
+#endif
