@@ -6,8 +6,6 @@
 #include <iostream>
 #include "comm_headers.h"
 #include "triangle.h"
-
-
 // 全局变量
 static IDirect3DDevice9* pDevice = 0;
 static IDirect3DSurface9* pSurface = 0;
