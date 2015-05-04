@@ -47,7 +47,7 @@ float fixpoint_to_float(int i,int fractbits)
 	*p = (*p << 23);
 	*p = (*p)|mantissa;
 	if (is_negative)
-		*p = -*p;
+		f = -f;
 	return f;
 }
 //把定点数转换成浮点数
