@@ -51,39 +51,4 @@ float fixpoint_to_float(int i,int fractbits)
 		f = -f;
 	return f;
 }
-//把定点数转换成浮点数
-float fixpoint_to_float2(int i,int fractbits)
-{
-	float ff=7.75f;
-	int *pp = (int*)&ff;
-	float f;
-	int *p = (int*)&f;
-	*p=0;
-	int is_negative=0;
-	if (i<0)
-	{
-		is_negative = 1;
-		i=-i;
-	}
-	//最高位bit所在位置
-	int highest_bit_pos = 31;
-	while (!((1<<highest_bit_pos) & i))
-		highest_bit_pos--;
-	int exponent = highest_bit_pos-fractbits;
-	exponent = exponent + 127;
-	//去掉最高位的1
-	int mantissa = (i & (  ~(1<<highest_bit_pos) ));
-	//再移位到第23个bit的位置,对齐
-	if (highest_bit_pos < 24)
-		mantissa = mantissa << (24-highest_bit_pos);
-	else
-		mantissa = mantissa << (highest_bit_pos-24);
-	*p = exponent;
-	*p = (*p << 23);
-	*p = (*p)|mantissa;
-	if (is_negative)
-		*p = -*p;
-	return f;
-}
-
 #endif
