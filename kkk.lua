@@ -34,7 +34,6 @@ atan_rad_table = {
 	[20] = 9.5367431640596e-007,
 }
 
-
 local accu_scale_table = {};
 accu_scale_table = {
 	[0] = 0.70710678118655,
@@ -59,16 +58,17 @@ accu_scale_table = {
     [19] = 0.60725293500925,
     [20] = 0.60725293500897,
 }
---[[
+
 for i=0,20 do
 	local acc = 1;
 	for ii=0,i do
 		acc = acc * 1/math.sqrt(1+(1/2^ii)^2);
 	end
 	--accu_scale_table[i] = acc;
-	print(i,'acc:',acc);
+	--print(i,'acc:',acc);
+	print('cos',1/math.sqrt(1+(1/2^i)^2) .. ',');
 end
---]]
+
 --[[
 x1 = cos(θ)* x0		-	sin(θ)*y0
 y1 = sin(θ)* x0		+	cos(θ)*y0
@@ -85,33 +85,33 @@ function cordic(rad)
 	print('参数:',rad)
 	print('参数的tan:',math.tan(rad),'cos',math.cos(rad),'sin',math.sin(rad));
 	local rad_index = 0;
-	local curr_rad = atan_rad_table[0];--初始时为第一个弧度math.atan( 1/2^0)，就是0.78539816339745
+	local z = atan_rad_table[0];--初始时为第一个弧度math.atan( 1/2^0)，就是0.78539816339745
 
 	local curr_x = 1
 	local curr_y = 0
 	local d = 1;
 	local iter = 0;
 	while iter < 20 do
-		if curr_rad < rad then
+		if z > rad then
 			d = -1;
-		elseif curr_rad > rad then
+		elseif z > rad then
 			d = 1;
 		end
-		print('d',d,'目的角度:',rad,'当前角度:',curr_rad,'加上角度:',d*atan_rad_table[iter]);
+		--print('d',d,'目的角度:',rad,'当前角度:',z,'加上角度:',d*atan_rad_table[iter]);
 		local x = curr_x 				- 	d*curr_y * (1/(2^iter));
 		local y = d*curr_x*(1/(2^iter)) +	curr_y;
-		curr_rad = curr_rad + d*atan_rad_table[iter];
+		z = z + d*atan_rad_table[iter];
 		--print('--------------------');
 		--print('x',x,'y',y)
 		--print('rad',rad)
 		--print('iter',iter)
-		--print('curr_rad',curr_rad);
+		--print('z',z);
 		curr_x = x;
 		curr_y = y;
 		iter = iter + 1;
 	end
-	print()
-	print('最终结果：：','curr_x:',curr_x,'curr_y:',curr_y,'curr_rad:',curr_rad,'参数rad：',rad);
+
+	print('最终结果：：','curr_x:',curr_x,'curr_y:',curr_y,'z:',z,'参数rad：',rad);
 	print('缩放值accu_scale::',accu_scale_table[iter]);
 	print('矫正后x，y',curr_x*accu_scale_table[iter],curr_y * accu_scale_table[iter]);
 	--print('cos',curr_x,accu_scale_table[iter],curr_x * accu_scale_table[iter]);
