@@ -182,18 +182,17 @@ float cos_table[] =
 float fast_tan(float rad)
 {
 	float z = atan_rad_table[0];
-	float curr_x = 1;
+	float curr_x = 0.6073;
 	float curr_y = 0;
 	int d = 1;
 	int iter = 0;
 	while (iter<20)
 	{
-		
 		float x = curr_x  - d*curr_y*inverse_two_power[iter];
 		float y = d*curr_x*inverse_two_power[iter] + curr_y;
 		z = z + d*atan_rad_table[iter];
-		curr_x = x/cos_table[iter];
-		curr_y = y/cos_table[iter];
+		curr_x = x;
+		curr_y = y;
 		iter++;
 		if (z>rad)
 		{

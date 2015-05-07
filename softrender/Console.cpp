@@ -56,7 +56,8 @@ int Game_Main()
 	StartClock();
 
 //#define  FRACBITS 16
-
+	float rad = 30/180.f * 3.1415926;
+	fast_tan(rad);
 	float f=700.12345f;
 	float g = 9.43f;
 	int ff = float_to_fixpoint(f,FRACBITS);
