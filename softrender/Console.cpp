@@ -66,8 +66,86 @@ int Game_Main()
 	int f_diviedby_g = float(ff) / (fg>>FRACBITS);
 	float converted_value = fixpoint_to_float(f_diviedby_g,FRACBITS);
 
-	float real_res = f/g;
+	float k_accu_table[21] = {
+		0.70710678118655f,
+		0.63245553203368f,
+		0.6135719910779f,
+		0.60883391251775f,
+		0.60764825625617f,
+		0.6073517701413f,
+		0.60727764409353f,
+		0.60725911229889f,
+		0.60725447933256f,
+		0.60725332108988f,
+		0.60725303152913f,
+		0.60725295913894f,
+		0.6072529410414f,
+		0.60725293651701f,
+		0.60725293538591f,
+		0.60725293510314f,
+		0.60725293503245f,
+		0.60725293501477f,
+		0.60725293501035f,
+		0.60725293500925f,
+		0.60725293500897f
+	};
 
+	for ( int i=0;i<21;i++)
+	{
+		printf("k_accu_table %d,%d,\n",i,float_to_fixpoint(k_accu_table[i],18));
+	}
+
+	float atan_rad_table[21] = {
+		0.78539816339745f,
+		0.46364760900081f,
+		0.24497866312686f,
+		0.12435499454676f,
+		0.062418809995957f,
+
+		0.031239833430268f,
+		0.015623728620477f,
+		0.0078123410601011f,
+		0.003906230131967f,
+		0.0019531225164788f,
+
+		0.00097656218955932f,
+		0.0004882812111949f,
+		0.00024414062014936f,
+		0.00012207031189367f,
+		6.1035156174209e-005f,
+
+		3.0517578115526e-005f,
+		1.5258789061316e-005f,
+		7.629394531102e-006f,
+		3.8146972656065e-006f,
+		1.9073486328102e-006f,
+
+		9.5367431640596e-007f,
+	};
+
+	for ( int i=0;i<21;i++)
+	{
+		printf("atan_rad_table %d,%d,\n",i,float_to_fixpoint(atan_rad_table[i],18));
+	}
+
+	unsigned long begin_tick = GetTickCount();
+	for ( int i=0;i<100000;i++)
+	{
+		fast_tan_fix_point_18(rad);
+	}
+	unsigned long end_tick = GetTickCount();
+
+	printf("fast_tan2 time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,fast_tan_fix_point_18(rad));
+
+
+	begin_tick = GetTickCount();
+	for ( int i=0;i<100000;i++)
+	{
+		sin(rad);
+	}
+	end_tick = GetTickCount();
+
+	printf("sin time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,sin(rad));
 
 	/*if (g_drawed%3==0)
 	{

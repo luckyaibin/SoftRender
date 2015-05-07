@@ -1,5 +1,6 @@
 #ifndef __TOOL_H__
 #define __TOOL_H__
+#include <math.h>
 //把浮点数转换成定点数，不通过*(1<<fracbits)的方式，只通过移位操作。fracbits是定点数偏移
 int float_to_fixpoint(float fval,int fracbits)
 {
@@ -179,17 +180,36 @@ float cos_table[] =
 	0.99999999999818,
 	0.99999999999955,
 };
+
+void dump_triangle_value(float rad)
+{
+	float pi = 3.14159265335f;
+	printf("弧度:%5.5f,角度:%5.5f°,sin:%5.5f,cos:%5.5f,tan:%5.5f,atan:%5.5f\n",rad,rad/pi*180,sin(rad),cos(rad),tan(rad),atan(rad));
+}
+//根据tan值得到弧度值
+float rad_by_tan(float tan_value)
+{
+	float pi = 3.14159265335f;
+	float rad = atan(tan_value);
+	printf("当前弧度为:%5.5f,角度为:%5.5f\n",rad,rad/pi*180);
+	return rad;
+}
+//最后需要矫正来得到正确的浮点数x和y值
 float fast_tan(float rad)
 {
-	float z = atan_rad_table[0];
-	float curr_x = 0.6073;
+	dump_triangle_value(rad);
+	float z = 0;
+	float curr_x = 1;
 	float curr_y = 0;
+	float final_x = curr_x*cos(rad) - curr_y*sin(rad);
+	float final_y = curr_x*sin(rad) + curr_y*cos(rad);
 	int d = 1;
 	int iter = 0;
-	while (iter<20)
+	while (iter<=20)
 	{
 		float x = curr_x  - d*curr_y*inverse_two_power[iter];
 		float y = d*curr_x*inverse_two_power[iter] + curr_y;
+		rad_by_tan(y/x);
 		z = z + d*atan_rad_table[iter];
 		curr_x = x;
 		curr_y = y;
@@ -199,10 +219,139 @@ float fast_tan(float rad)
 			d = -1;
 		}
 		else
-			d = 1;
+			d = +1;
 	}
-
+	float adjusted_x = k_accu_table[20] * curr_x;
+	float adjusted_y = k_accu_table[20] * curr_y;
+	rad_by_tan(adjusted_y/adjusted_x);
 	return 0.0f;
+}
+
+//最后不需要矫正的浮点数xy的值，因为初始化的时候x已经被乘以了最后的矫正值
+float fast_tan2(float rad)
+{
+	//dump_triangle_value(rad);
+	float z = 0;
+	float curr_x = k_accu_table[20];
+	float curr_y = 0;
+	int d = 1;
+	int iter = 0;
+	while (iter<=20)
+	{
+		float x = curr_x  - d*curr_y*inverse_two_power[iter];
+		float y = d*curr_x*inverse_two_power[iter] + curr_y;
+		//rad_by_tan(y/x);
+		z = z + d*atan_rad_table[iter];
+		curr_x = x;
+		curr_y = y;
+		iter++;
+		if (z>rad)
+		{
+			d = -1;
+		}
+		else
+			d = +1;
+	}
+	float cos_v = curr_x;
+	float sin_v = curr_y;
+	//rad_by_tan(adjusted_y/adjusted_x);
+	return 0.0f;
+}
+
+//定点数版本
+float fast_tan_fix_point_18(float float_rad)
+{
+	//这些都是浮点数左移了18bit之后的定点数
+	int k_accu_table[21] = {
+		185363,
+		165794,
+		160844,
+		159602,
+		159291,
+		159213,
+		159194,
+		159189,
+		159188,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+		159187,
+	};
+	int atan_rad_table[21]={
+		205887,
+		121542,
+		64219,
+		32598,
+		16362,
+		8189,
+		4095,
+		2047,
+		1023,
+		511,
+		255,
+		127,
+		64,
+		32,
+		16,
+		8,
+		4,
+		2,
+		1,
+		0,
+		0,
+	};
+	//dump_triangle_value(rad);
+	int rad = float_to_fixpoint(float_rad,18);
+
+	int z = 0;
+	int curr_x = k_accu_table[20];
+	int curr_y = 0;
+	
+	int d = 1;
+	int iter = 0;
+	while (iter<=10)
+	{
+		int x,y;
+		if (d>0)
+		{
+			x = curr_x  - (curr_y>>iter);
+			y = (curr_x>>iter) + curr_y;
+			z = z + atan_rad_table[iter];
+		}
+		else
+		{
+			x = curr_x  + (curr_y>>iter);
+			y = curr_y - (curr_x>>iter) ;
+			z = z - atan_rad_table[iter];
+		}
+		//printf("%5.5f,%f5.5\n",fixpoint_to_float(x,18),fixpoint_to_float(y,18));
+		//rad_by_tan((float)y/x);
+		curr_x = x;
+		curr_y = y;
+		iter++;
+		if (z>rad)
+		{
+			d = -1;
+		}
+		else
+			d = +1;
+	}
+	int cos_v = curr_x;
+	int sin_v = curr_y;
+
+	float f_cos_v = fixpoint_to_float(cos_v,18);
+	float f_sin_v = fixpoint_to_float(sin_v,18);
+
+	//rad_by_tan(adjusted_y/adjusted_x);
+	return f_sin_v;
 }
 
 
