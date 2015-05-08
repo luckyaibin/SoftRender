@@ -317,7 +317,7 @@ float fast_tan_fix_point_18(float float_rad)
 	
 	int d = 1;
 	int iter = 0;
-	while (iter<=10)
+	while (iter<=20)
 	{
 		int x,y;
 		if (d>0)

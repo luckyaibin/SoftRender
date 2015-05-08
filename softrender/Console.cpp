@@ -55,6 +55,35 @@ int Game_Main()
 	
 	StartClock();
 
+
+int bit_map[] = {
+	0,	1,	2,	2,	3,	3,	3,	3,
+	4,	4,	4,	4,	4,	4,	4,	4,
+};
+
+	int n = 41;//rand();
+	int lvl=4;
+	int msb=0;
+	while (lvl>=0)
+	{
+		//高bit部分大于0
+		//取高位部分
+		if( n>>(1<<lvl) & ( (1<<(1<<lvl)) - 1)) //高位大于0 (1<<(lvl+1) - 1)是mask
+		{
+			n=n>>(1<<lvl);
+			msb = msb + (1<<lvl);
+		}
+		else //取低位部分
+		{
+			n=n & ( (1<<(1<<lvl))-1); 
+			//msb = msb >> (1<<lvl);
+		}
+		lvl--;
+	}
+	printf("msb is %d\n",msb);
+#define HIGHEST_BIT(n) \
+	bit_map[(n>>28)&0xff] ||
+
 //#define  FRACBITS 16
 	float rad = 30/180.f * 3.1415926;
 	fast_tan(rad);
