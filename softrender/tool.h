@@ -1,6 +1,163 @@
 #ifndef __TOOL_H__
 #define __TOOL_H__
 #include <math.h>
+int get_msb0(unsigned int n)
+{
+	int highest_bit_pos = 31;
+	if (0==n)
+	{
+		return 0;
+	}
+	while (!((1<<highest_bit_pos) & n))
+		highest_bit_pos--;
+	return highest_bit_pos;
+}
+//get most significant bit,获取最高位为1的bit索引
+int get_msb1(unsigned int n)
+{
+	int lvl=4;
+	int msb=0;
+	while (lvl>=0)
+	{
+		//高bit部分大于0
+		//取高位部分
+		if( n>>(1<<lvl) & ( (1<<(1<<lvl)) - 1)) //高位大于0 (1<<(lvl+1) - 1)是mask
+		{
+			n=n>>(1<<lvl);
+			msb = msb + (1<<lvl);
+		}
+		else //取低位部分
+		{
+			n=n & ( (1<<(1<<lvl))-1);
+		}
+		lvl--;
+	}
+	//printf("msb is %d\n",msb);
+	return msb;
+}
+int get_msb2(unsigned int n)
+{
+	int lvl=4;
+	int msb=0;
+	while (lvl>=0)
+	{
+		//高bit部分大于0
+		//取高位部分
+		int shift = 1<<lvl;
+		if( n>>shift ) //高位大于0 (1<<(lvl+1) - 1)是mask
+		{
+			n=n>>shift;
+			msb = msb + shift;
+		}
+		lvl--;
+	}
+	//printf("msb is %d\n",msb);
+	return msb;
+}
+
+int get_msb_noloop(unsigned int n)
+{
+	int msb=0;
+	///////////////////////lvl=4
+	if( n>>16 &  0xFFFF ) 
+	{
+		n=n>>16;
+		msb = msb + 16;
+	}
+	else //取低位部分
+	{
+		n=n & 0xFFFF ; 
+	}
+	//////////////////////lvl=3
+	if( n>>8 & 0xFF )
+	{
+		n=n>>8;
+		msb = msb + 8;
+	}
+	else //取低位部分
+	{
+		n=n & 0xFF; 
+	}
+	///////////////////////lvl=2
+	if( n>>4 & 0xF) 
+	{
+		n=n>>4;
+		msb = msb + 4;
+	}
+	else //取低位部分
+	{
+		n=n & 0xF; 
+	}
+	//////////////////////lvl=1
+	if( n>>2 & 0x3)
+	{
+		n=n>>2;
+		msb = msb + 2;
+	}
+	else //取低位部分
+	{
+		n=n & 0x3; 
+	}
+	/////////////////////lvl=0
+	if( n>>1 & 0x1)
+	{
+		//n=n>>1;last step,no need to shift n;
+		msb = msb + 1;
+	}
+	else //取低位部分
+	{
+		//last step,no need to get n's half low bits 
+		//n=n & ( 1 ); 
+	}
+
+	//printf("msb is %d\n",msb);
+	return msb;
+}
+
+
+
+
+int get_msb_noloop0(unsigned int n)
+{
+	int msb=0;
+	unsigned int m;
+	m = n>>16;
+	if(m) 
+	{
+		n=m;
+		msb = msb + 16;
+	}
+	m=n>>8;
+	if(m)
+	{
+		n=m;
+		msb = msb + 8;
+	}
+	m=n>>4;
+	if(m) 
+	{
+		n=m;
+		msb = msb + 4;
+	}
+	m=n>>2;
+	if(m)
+	{
+		n=m;
+		msb = msb + 2;
+	}
+	m=n>>1;
+	if( m )
+	{
+		//n=m;last step,no need to shift n;
+		msb = msb + 1;
+	}
+	//printf("msb is %d\n",msb);
+	return msb;
+}
+
+
+
+
 //把浮点数转换成定点数，不通过*(1<<fracbits)的方式，只通过移位操作。fracbits是定点数偏移
 int float_to_fixpoint(float fval,int fracbits)
 {
@@ -33,9 +190,10 @@ float fixpoint_to_float(int i,int fractbits)
 		i=-i;
 	}
 	//最高位bit所在位置
-	int highest_bit_pos = 31;
+	/*int highest_bit_pos = 31;
 	while (!((1<<highest_bit_pos) & i))
-		highest_bit_pos--;
+		highest_bit_pos--;*/
+	int highest_bit_pos = get_msb_noloop0(i);
 	int exponent = highest_bit_pos-fractbits;
 	exponent = exponent + 127;
 	//去掉最高位的1
@@ -78,8 +236,19 @@ tan(θ)为    π* 1/2      π* 1/4      π* 1/8
 
 而tan(θ)则为 1/(2^n) ,这个值也可以通过查表得到
 
+关于最后乘以一个校正值的正确性推导：
+Xn = Xn-1 * cos(θn-1) - Yn-1 * sin(θn-1)
+Yn = Yn-1 * sin(θn-1) + Yn-1 * cos(θn-1)
 
+Xn+1 = Xn * cos(θn) - Yn * sin(θn)
+Yn+1 = Xn * sin(θn) + Yn * cos(θn)
+代入后根据积化和差公式可以得到
 
+Xn+1 = cos(θn-1 + θn) * Xn-1 - sin(θn-1 + θn) * Yn-1
+Yn+1 = sin(θn-1 + θn) * Xn-1 + cos(θn-1 + θn) * Yn-1
+
+所以最后的X，Y的值其实等于连续旋转的所有角度加起来的cos和sin值乘以最初的x，y的值
+只可意会，感觉说不明白了。。
 */
 float atan_rad_table[21] = {
 	0.78539816339745f,
@@ -230,6 +399,12 @@ float fast_tan(float rad)
 //最后不需要矫正的浮点数xy的值，因为初始化的时候x已经被乘以了最后的矫正值
 float fast_tan2(float rad)
 {
+	float half_pi = 1.57079632675;
+	float theta_du = fmod(rad,half_pi);  
+	if (rad > theta_du)
+	{
+
+	}
 	//dump_triangle_value(rad);
 	float z = 0;
 	float curr_x = k_accu_table[20];

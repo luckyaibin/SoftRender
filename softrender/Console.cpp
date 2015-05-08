@@ -54,35 +54,13 @@ int Game_Main()
 {
 	
 	StartClock();
-
-
-int bit_map[] = {
-	0,	1,	2,	2,	3,	3,	3,	3,
-	4,	4,	4,	4,	4,	4,	4,	4,
-};
-
-	int n = 41;//rand();
-	int lvl=4;
-	int msb=0;
-	while (lvl>=0)
+	srand(GetTickCount());
+	for(int cnt=0;cnt < 100000;cnt++)
 	{
-		//高bit部分大于0
-		//取高位部分
-		if( n>>(1<<lvl) & ( (1<<(1<<lvl)) - 1)) //高位大于0 (1<<(lvl+1) - 1)是mask
-		{
-			n=n>>(1<<lvl);
-			msb = msb + (1<<lvl);
-		}
-		else //取低位部分
-		{
-			n=n & ( (1<<(1<<lvl))-1); 
-			//msb = msb >> (1<<lvl);
-		}
-		lvl--;
+		int i = rand();
+		i = (i+3)*i;
+		int highest_bit_pos = get_msb2(i);
 	}
-	printf("msb is %d\n",msb);
-#define HIGHEST_BIT(n) \
-	bit_map[(n>>28)&0xff] ||
 
 //#define  FRACBITS 16
 	float rad = 30/180.f * 3.1415926;
@@ -95,6 +73,12 @@ int bit_map[] = {
 	int f_diviedby_g = float(ff) / (fg>>FRACBITS);
 	float converted_value = fixpoint_to_float(f_diviedby_g,FRACBITS);
 
+	for (float f=-100.0f;f<100.0f;f=f+1.0f)
+	{
+		float mod = fmod(f,1.7f);
+		printf("%5.5f\n",mod);
+	}
+	/*
 	float k_accu_table[21] = {
 		0.70710678118655f,
 		0.63245553203368f,
@@ -156,25 +140,26 @@ int bit_map[] = {
 	{
 		printf("atan_rad_table %d,%d,\n",i,float_to_fixpoint(atan_rad_table[i],18));
 	}
-
+	*/
 	unsigned long begin_tick = GetTickCount();
 	for ( int i=0;i<100000;i++)
 	{
-		fast_tan_fix_point_18(rad);
+		fast_tan2((float)i);
 	}
 	unsigned long end_tick = GetTickCount();
+
+	printf("sin time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,sin(rad));
+	begin_tick = GetTickCount();
+	for ( int i=0;i<100000;i++)
+	{
+		fast_tan_fix_point_18((float)i);
+	}
+	end_tick = GetTickCount();
 
 	printf("fast_tan2 time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,fast_tan_fix_point_18(rad));
 
 
-	begin_tick = GetTickCount();
-	for ( int i=0;i<100000;i++)
-	{
-		sin(rad);
-	}
-	end_tick = GetTickCount();
-
-	printf("sin time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,sin(rad));
+	
 
 	/*if (g_drawed%3==0)
 	{
