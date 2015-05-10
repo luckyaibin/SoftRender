@@ -1,23 +1,23 @@
 #ifndef __MATRIX_H
 #define __MATRIX_H
 #include <memory.h>
-
+#include "base_type.h"
 struct Matrix3;
 struct Matrix4;
 
 Matrix3 operator*(const Matrix3& m1,const Matrix3& m2);
 Matrix3 operator*(const Matrix3& m1,float f);
 Matrix3 operator*(float f,const Matrix3 &m1);
-const float& get_element_const_ref(const Matrix3& m,int row,int col);
-float& get_element_ref(Matrix3& m,int row,int col);
+const float& get_element_const_ref(const Matrix3& m,int32_t row,int32_t col);
+float& get_element_ref(Matrix3& m,int32_t row,int32_t col);
 void matrix_dump(const Matrix3&);
 
 Matrix4 operator*(const Matrix4& m1,const Matrix4& m2);
 Matrix4 operator*(const Matrix4& m1,float f);
 Matrix4 operator*(float f,const Matrix4 &m1);
 
-const float& get_element_const_ref(const Matrix4& m,int row,int col);
-float& get_element_ref(Matrix4& m,int row,int col);
+const float& get_element_const_ref(const Matrix4& m,int32_t row,int32_t col);
+float& get_element_ref(Matrix4& m,int32_t row,int32_t col);
 void matrix_dump(const Matrix4&);
 
 struct Matrix3

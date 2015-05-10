@@ -1,215 +1,9 @@
 #ifndef __TOOL_H__
 #define __TOOL_H__
+#include "base_type.h"
+#include "math_tool.h"
 #include <math.h>
-int get_msb0(unsigned int n)
-{
-	int highest_bit_pos = 31;
-	if (0==n)
-	{
-		return 0;
-	}
-	while (!((1<<highest_bit_pos) & n))
-		highest_bit_pos--;
-	return highest_bit_pos;
-}
-//get most significant bit,获取最高位为1的bit索引
-int get_msb1(unsigned int n)
-{
-	int lvl=4;
-	int msb=0;
-	while (lvl>=0)
-	{
-		//高bit部分大于0
-		//取高位部分
-		if( n>>(1<<lvl) & ( (1<<(1<<lvl)) - 1)) //高位大于0 (1<<(lvl+1) - 1)是mask
-		{
-			n=n>>(1<<lvl);
-			msb = msb + (1<<lvl);
-		}
-		else //取低位部分
-		{
-			n=n & ( (1<<(1<<lvl))-1);
-		}
-		lvl--;
-	}
-	//printf("msb is %d\n",msb);
-	return msb;
-}
-int get_msb2(unsigned int n)
-{
-	int lvl=4;
-	int msb=0;
-	while (lvl>=0)
-	{
-		//高bit部分大于0
-		//取高位部分
-		int shift = 1<<lvl;
-		if( n>>shift ) //高位大于0 (1<<(lvl+1) - 1)是mask
-		{
-			n=n>>shift;
-			msb = msb + shift;
-		}
-		lvl--;
-	}
-	//printf("msb is %d\n",msb);
-	return msb;
-}
 
-int get_msb_noloop(unsigned int n)
-{
-	int msb=0;
-	///////////////////////lvl=4
-	if( n>>16 &  0xFFFF ) 
-	{
-		n=n>>16;
-		msb = msb + 16;
-	}
-	else //取低位部分
-	{
-		n=n & 0xFFFF ; 
-	}
-	//////////////////////lvl=3
-	if( n>>8 & 0xFF )
-	{
-		n=n>>8;
-		msb = msb + 8;
-	}
-	else //取低位部分
-	{
-		n=n & 0xFF; 
-	}
-	///////////////////////lvl=2
-	if( n>>4 & 0xF) 
-	{
-		n=n>>4;
-		msb = msb + 4;
-	}
-	else //取低位部分
-	{
-		n=n & 0xF; 
-	}
-	//////////////////////lvl=1
-	if( n>>2 & 0x3)
-	{
-		n=n>>2;
-		msb = msb + 2;
-	}
-	else //取低位部分
-	{
-		n=n & 0x3; 
-	}
-	/////////////////////lvl=0
-	if( n>>1 & 0x1)
-	{
-		//n=n>>1;last step,no need to shift n;
-		msb = msb + 1;
-	}
-	else //取低位部分
-	{
-		//last step,no need to get n's half low bits 
-		//n=n & ( 1 ); 
-	}
-
-	//printf("msb is %d\n",msb);
-	return msb;
-}
-
-
-
-
-int get_msb_noloop0(unsigned int n)
-{
-	int msb=0;
-	unsigned int m;
-	m = n>>16;
-	if(m) 
-	{
-		n=m;
-		msb = msb + 16;
-	}
-	m=n>>8;
-	if(m)
-	{
-		n=m;
-		msb = msb + 8;
-	}
-	m=n>>4;
-	if(m) 
-	{
-		n=m;
-		msb = msb + 4;
-	}
-	m=n>>2;
-	if(m)
-	{
-		n=m;
-		msb = msb + 2;
-	}
-	m=n>>1;
-	if( m )
-	{
-		//n=m;last step,no need to shift n;
-		msb = msb + 1;
-	}
-	//printf("msb is %d\n",msb);
-	return msb;
-}
-
-
-
-
-//把浮点数转换成定点数，不通过*(1<<fracbits)的方式，只通过移位操作。fracbits是定点数偏移
-int float_to_fixpoint(float fval,int fracbits)
-{
-	int ival = *(int *)&fval;
-	// 提取尾数,注意实际的尾数前面还有一个被省略掉的1
-	int mantissa = (ival & 0x007fffff) | 0x800000;
-	// 提取指数,以23分界
-	int exponent =  (ival >> 23) & 0xff;
-	exponent = exponent - 127;//得到真正的指数值
-	if ( (fracbits+exponent) < 23)
-		mantissa = mantissa>>( 23 - (fracbits+exponent));
-	else
-		mantissa = mantissa<<(  (fracbits+exponent) - 23);
-	// 如果小于0，则将结果取反
-	if ((*(int *)&fval) & 0x80000000)
-		mantissa = -mantissa;
-	//int vvv = fval * (1<<fracbits);
-	return mantissa;
-}
-//把定点数转换成浮点数
-float fixpoint_to_float(int i,int fractbits)
-{
-	float f;
-	int *p = (int*)&f;
-	*p=0;
-	int is_negative=0;
-	if (i<0)
-	{
-		is_negative = 1;
-		i=-i;
-	}
-	//最高位bit所在位置
-	/*int highest_bit_pos = 31;
-	while (!((1<<highest_bit_pos) & i))
-		highest_bit_pos--;*/
-	int highest_bit_pos = get_msb_noloop0(i);
-	int exponent = highest_bit_pos-fractbits;
-	exponent = exponent + 127;
-	//去掉最高位的1
-	int mantissa = (i & (  ~(1<<highest_bit_pos) ));
-	//再把最高位右边那个bit移位到第23个bit的位置,对齐
-	if (highest_bit_pos-1<22)
-		mantissa = mantissa << (22 - (highest_bit_pos - 1));
-	else
-		mantissa = mantissa >> ( (highest_bit_pos-1) - 22 );
-	*p = exponent;
-	*p = (*p << 23);
-	*p = (*p)|mantissa;
-	if (is_negative)
-		f = -f;
-	return f;
-}
 
 /*
 (x0,y0)的向量逆时针旋转theta之后为(x1,y1)
@@ -372,8 +166,8 @@ float fast_tan(float rad)
 	float curr_y = 0;
 	float final_x = curr_x*cos(rad) - curr_y*sin(rad);
 	float final_y = curr_x*sin(rad) + curr_y*cos(rad);
-	int d = 1;
-	int iter = 0;
+	int32_t d = 1;
+	int32_t iter = 0;
 	while (iter<=20)
 	{
 		float x = curr_x  - d*curr_y*inverse_two_power[iter];
@@ -397,20 +191,35 @@ float fast_tan(float rad)
 }
 
 //最后不需要矫正的浮点数xy的值，因为初始化的时候x已经被乘以了最后的矫正值
-float fast_tan2(float rad)
+float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 {
-	float half_pi = 1.57079632675;
-	float theta_du = fmod(rad,half_pi);  
-	if (rad > theta_du)
+	//正弦余弦的符号
+	int32_t sin_sign = 1;
+	int32_t cos_sign = 1;
+	rad = fmod(rad,TWO_PI);  
+	if (rad < 0)
+	{ 
+		sin_sign = -sin_sign;
+		rad = - rad;
+	}
+	if (rad >= PI)
 	{
-
+		rad = rad - PI;
+		sin_sign = -sin_sign;
+		cos_sign = -cos_sign;
+	}
+	if (rad>=HALF_PI)
+	{
+		rad = rad-HALF_PI;
+		sin_sign = sin_sign*1;
+		cos_sign=  cos_sign*(-1);
 	}
 	//dump_triangle_value(rad);
 	float z = 0;
 	float curr_x = k_accu_table[20];
 	float curr_y = 0;
-	int d = 1;
-	int iter = 0;
+	int32_t d = 1;
+	int32_t iter = 0;
 	while (iter<=20)
 	{
 		float x = curr_x  - d*curr_y*inverse_two_power[iter];
@@ -427,17 +236,24 @@ float fast_tan2(float rad)
 		else
 			d = +1;
 	}
-	float cos_v = curr_x;
-	float sin_v = curr_y;
+	float cos_v = curr_x*cos_sign;
+	float sin_v = curr_y*sin_sign;
+	//printf("cos is %5.5f,sin is %5.5f\n",cos_v*cos_sign,sin_v*sin_sign);
+	if (p_sin)
+		*p_sin = sin_v;
+	if (p_cos)
+		*p_cos = cos_v;
+	if (p_tan)
+		*p_tan = sin_v/cos_v;
 	//rad_by_tan(adjusted_y/adjusted_x);
-	return 0.0f;
+	return sin_v;
 }
 
 //定点数版本
 float fast_tan_fix_point_18(float float_rad)
 {
 	//这些都是浮点数左移了18bit之后的定点数
-	int k_accu_table[21] = {
+	int32_t k_accu_table[21] = {
 		185363,
 		165794,
 		160844,
@@ -460,7 +276,7 @@ float fast_tan_fix_point_18(float float_rad)
 		159187,
 		159187,
 	};
-	int atan_rad_table[21]={
+	int32_t atan_rad_table[21]={
 		205887,
 		121542,
 		64219,
@@ -484,17 +300,17 @@ float fast_tan_fix_point_18(float float_rad)
 		0,
 	};
 	//dump_triangle_value(rad);
-	int rad = float_to_fixpoint(float_rad,18);
+	int32_t rad = float_to_fixpoint(float_rad,18);
 
-	int z = 0;
-	int curr_x = k_accu_table[20];
-	int curr_y = 0;
+	int32_t z = 0;
+	int32_t curr_x = k_accu_table[20];
+	int32_t curr_y = 0;
 	
-	int d = 1;
-	int iter = 0;
+	int32_t d = 1;
+	int32_t iter = 0;
 	while (iter<=20)
 	{
-		int x,y;
+		int32_t x,y;
 		if (d>0)
 		{
 			x = curr_x  - (curr_y>>iter);
@@ -519,8 +335,8 @@ float fast_tan_fix_point_18(float float_rad)
 		else
 			d = +1;
 	}
-	int cos_v = curr_x;
-	int sin_v = curr_y;
+	int32_t cos_v = curr_x;
+	int32_t sin_v = curr_y;
 
 	float f_cos_v = fixpoint_to_float(cos_v,18);
 	float f_sin_v = fixpoint_to_float(sin_v,18);
@@ -542,7 +358,7 @@ double my_atan4(double x, double y)
 		0.0559528918938, 0.027976452617, 0.01398822714227, 0.006994113675353, 0.003497056850704  
 	};  
 
-	int i = 0;  
+	int32_t i = 0;  
 	double x_new, y_new;  
 	double angleSum = 0.0;  
 

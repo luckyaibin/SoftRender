@@ -18,20 +18,20 @@ static IDirect3DSurface9* pSurface = 0;
 #define GET_ARGB_G(argb) ( (argb>>8) & ARGB_MASK)
 #define GET_ARGB_B(argb) ( (argb>>0) & ARGB_MASK)
 // º¯Êý
-bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int width, int height);
+bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height);
 
 void FlipSurface();
 void Release3DLib();
 
-bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int width, int height);
+bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height);
 
-int DrawPixel(int x,int y, ARGB color);
+int32_t DrawPixel(int32_t x,int32_t y, ARGB color);
 
 
 
-void DrawLine(int sx,int sy,int ex,int ey,ARGB color);
-int DrawPartCircle(int centerx,int centery,int x,int y,ARGB color);
-int DrawCircle(int x,int y,int r,ARGB color);
-int DrawTriangle( vertex2d v1, vertex2d v2,  vertex2d v3,ARGB color);
+void DrawLine(int32_t sx,int32_t sy,int32_t ex,int32_t ey,ARGB color);
+int32_t DrawPartCircle(int32_t centerx,int32_t centery,int32_t x,int32_t y,ARGB color);
+int32_t DrawCircle(int32_t x,int32_t y,int32_t r,ARGB color);
+int32_t DrawTriangle( vertex2d v1, vertex2d v2,  vertex2d v3,ARGB color);
 void drawTriangle(vertex2d v1,vertex2d v2,vertex2d v3,ARGB color);
 #endif

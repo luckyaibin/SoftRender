@@ -1,6 +1,6 @@
 #include "draw.h"
 
-bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int width, int height)
+bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height)
 {
 	IDirect3D9* d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
 
@@ -50,7 +50,7 @@ void Release3DLib()
 	pDevice->Release();
 }
 
-int DrawPixel(int x,int y, ARGB color)
+int32_t DrawPixel(int32_t x,int32_t y, ARGB color)
 {
 	// 创建并初始化锁定区域
 	D3DLOCKED_RECT lr;
@@ -71,34 +71,34 @@ int DrawPixel(int x,int y, ARGB color)
 }
 //Bresenham's algorithm 
 //不需要浮点数的Bresenham 算法
-void DrawLine(int x0,int y0,int x1,int y1,ARGB color)
+void DrawLine(int32_t x0,int32_t y0,int32_t x1,int32_t y1,ARGB color)
 {
 	//printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
-	int steep = abs(y1-y0) > abs(x1-x0);
+	int32_t steep = abs(y1-y0) > abs(x1-x0);
 	if(steep)//如果斜率绝对值大于1，交换x和y，变成斜率绝对值小于1的
 	{
-		MACRO_SWAP(x0,y0,int);
-		MACRO_SWAP(x1,y1,int);
+		MACRO_SWAP(x0,y0,int32_t);
+		MACRO_SWAP(x1,y1,int32_t);
 	}
 	if(x0 > x1)//如果反方向（从右上至左下）,交换起点和终点
 	{
-		MACRO_SWAP(x0,x1,int);
-		MACRO_SWAP(y0,y1,int);
+		MACRO_SWAP(x0,x1,int32_t);
+		MACRO_SWAP(y0,y1,int32_t);
 	}
 
 	//printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
-	int deltax =  x1 - x0;
-	int deltay =  y1 - y0;
-	int error = 0;
-	int deltaerr =  abs(deltay);
-	int ystep;
+	int32_t deltax =  x1 - x0;
+	int32_t deltay =  y1 - y0;
+	int32_t error = 0;
+	int32_t deltaerr =  abs(deltay);
+	int32_t ystep;
 	if (y0<y1)
 		ystep = 1;
 	else
 		ystep = -1;
 
-	int y = y0;
-	int x;
+	int32_t y = y0;
+	int32_t x;
 	for (x = x0;x<=x1;x++)
 	{
 		if (steep)//x 和 y 坐标是调换过了，绘制的时候要再调换回去
@@ -115,19 +115,19 @@ void DrawLine(int x0,int y0,int x1,int y1,ARGB color)
 }
 
 //Bresenham's algorithm 
-void DrawLine_with_float(int x0,int y0,int x1,int y1,ARGB color)
+void DrawLine_with_float(int32_t x0,int32_t y0,int32_t x1,int32_t y1,ARGB color)
 {
 	printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
-	int steep = abs(y1-y0) > abs(x1-x0);
+	int32_t steep = abs(y1-y0) > abs(x1-x0);
 	if(steep)//如果斜率绝对值大于1，交换x和y，变成斜率绝对值小于1的
 	{
-		MACRO_SWAP(x0,y0,int);
-		MACRO_SWAP(x1,y1,int);
+		MACRO_SWAP(x0,y0,int32_t);
+		MACRO_SWAP(x1,y1,int32_t);
 	}
 	if(x0 > x1)//如果反方向（从右上至左下）,交换起点和终点
 	{
-		MACRO_SWAP(x0,x1,int);
-		MACRO_SWAP(y0,y1,int);
+		MACRO_SWAP(x0,x1,int32_t);
+		MACRO_SWAP(y0,y1,int32_t);
 	}
 
 	printf("x0:%d,y0:%d,x1:%d,y1:%d\n",x0,y0,x1,y1);
@@ -135,14 +135,14 @@ void DrawLine_with_float(int x0,int y0,int x1,int y1,ARGB color)
 	float deltay =  y1 - y0;
 	float error = 0;
 	float deltaerr =  abs(deltay / deltax);
-	int ystep;
+	int32_t ystep;
 	if (y0<y1)
 		ystep = 1;
 	else
 		ystep = -1;
 
-	int y = y0;
-	int x;
+	int32_t y = y0;
+	int32_t x;
 	for (x = x0;x<=x1;x++)
 	{
 		if (steep)//x 和 y 坐标是调换过了，绘制的时候要再调换回去
@@ -158,7 +158,7 @@ void DrawLine_with_float(int x0,int y0,int x1,int y1,ARGB color)
 	}
 }
 
-int DrawPartCircle(int centerx,int centery,int x,int y,ARGB color)
+int32_t DrawPartCircle(int32_t centerx,int32_t centery,int32_t x,int32_t y,ARGB color)
 {
 	DrawPixel(centerx + x,centery + y,color);
 	DrawPixel(centerx + x,centery - y,color);
@@ -171,10 +171,10 @@ int DrawPartCircle(int centerx,int centery,int x,int y,ARGB color)
 	return 0;
 }
 
-int DrawCircle(int xc,int yc,int r,ARGB color)
+int32_t DrawCircle(int32_t xc,int32_t yc,int32_t r,ARGB color)
 {
-	int x=0,y=r;
-	int d = 3 - 2*r;
+	int32_t x=0,y=r;
+	int32_t d = 3 - 2*r;
 	while(x<y)
 	{
 		DrawPartCircle(xc,yc,x,y,color);
@@ -200,7 +200,7 @@ top triangle:
 	  ------
 P1(x1,y1)  P2(x2,y2)
   */
-int DrawTriangle(  vertex2d v1,   vertex2d v2,  vertex2d v3,ARGB color)
+int32_t DrawTriangle(  vertex2d v1,   vertex2d v2,  vertex2d v3,ARGB color)
 {
 	float x1 = v1.x;
 	float y1 = v1.y;
@@ -209,14 +209,14 @@ int DrawTriangle(  vertex2d v1,   vertex2d v2,  vertex2d v3,ARGB color)
 	float x3 = v3.x;
 	float y3 = v3.y;
 
-	int minx = (int)MACRO_MIN3(x1,x2,x3);
-	int maxx = (int)MACRO_MAX3(x1,x2,x3);
-	int miny = (int)MACRO_MIN3(y1,y2,y3);
-	int maxy = (int)MACRO_MAX3(y1,y2,y3);
+	int32_t minx = (int32_t)MACRO_MIN3(x1,x2,x3);
+	int32_t maxx = (int32_t)MACRO_MAX3(x1,x2,x3);
+	int32_t miny = (int32_t)MACRO_MIN3(y1,y2,y3);
+	int32_t maxy = (int32_t)MACRO_MAX3(y1,y2,y3);
 
-	for(int y = miny; y < maxy; y++)
+	for(int32_t y = miny; y < maxy; y++)
 	{
-		for(int x = minx; x < maxx; x++)
+		for(int32_t x = minx; x < maxx; x++)
 		{
 			// When all half-space functions positive, pixel is in triangle
 			if((x1 - x2) * (y - y1) - (y1 - y2) * (x - x1) > 0 &&  (x2 - x3) * (y - y2) - (y2 - y3) * (x - x2) > 0 && (x3 - x1) * (y - y3) - (y3 - y1) * (x - x3) > 0)
@@ -228,7 +228,7 @@ int DrawTriangle(  vertex2d v1,   vertex2d v2,  vertex2d v3,ARGB color)
 	return 0;
 }
 
-int DrawPolygon2d(polygon2d * p)
+int32_t DrawPolygon2d(polygon2d * p)
 {
 	return 0;
 }
@@ -241,7 +241,7 @@ void fillBottomFlatTriangle(vertex2d v1,vertex2d v2,vertex2d v3,ARGB color)
 	float invslop2 = (v3.x - v1.x) / (v3.y - v1.y);
 	float curx1 = v1.x;
 	float curx2 = v1.x;
-	for (int scalineY = v1.y;scalineY <= v2.y;scalineY++)
+	for (int32_t scalineY = v1.y;scalineY <= v2.y;scalineY++)
 	{
 		DrawLine(curx1,scalineY,curx2,scalineY,color);
 		curx1 += invslop1;
@@ -257,11 +257,11 @@ void fillTopFlatTriangle(vertex2d v1,vertex2d v2,vertex2d v3,ARGB color)
 	float curx1 = v3.x;
 	float curx2 = v3.x;
 
-	for (int scanlineY = v3.y; scanlineY > v1.y; scanlineY--)
+	for (int32_t scanlineY = v3.y; scanlineY > v1.y; scanlineY--)
 	{
 		curx1 -= invslope1;
 		curx2 -= invslope2;
-		DrawLine((int)curx1, scanlineY, (int)curx2, scanlineY,color);
+		DrawLine((int32_t)curx1, scanlineY, (int32_t)curx2, scanlineY,color);
 	}
 }
 

@@ -1,6 +1,6 @@
 #include "draw.h"
 #include "triangle.h"
-
+#include "comm_headers.h"
 
 float cross_product(vertex2d v1,vertex2d v2)
 {
@@ -12,7 +12,7 @@ float cross_product(vertex2d v1,vertex2d v2)
 	 /     \	p(x,y)
 	v2-----v3
 */
-int is_point_in_triangle_by_crossproduct(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int is_clockwise/*=-1*/)
+int32_t is_point_in_triangle_by_crossproduct(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int32_t is_clockwise/*=-1*/)
 {
 	//向量：v1->v2,也用vertex2d存储
 	vertex2d V1_2,V2_3,V3_1;
@@ -55,7 +55,7 @@ int is_point_in_triangle_by_crossproduct(vertex2d p,vertex2d v1,vertex2d v2, ver
 	 /     \	p(x,y)
 	v1-----v2
 */
-int is_point_in_triangle_by_barycentric_algo(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int is_clockwise/*=0*/)
+int32_t is_point_in_triangle_by_barycentric_algo(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int32_t is_clockwise/*=0*/)
 {
 	/*
 	(v2-v1)*s + (v3-v1)*t = (p-v1)
@@ -90,7 +90,7 @@ int is_point_in_triangle_by_barycentric_algo(vertex2d p,vertex2d v1,vertex2d v2,
 
 void init_edge_eqn(struct edge_eqn *edge,vertex2d v0,vertex2d v1)
 {
-	//const static int FRACBITS=12;
+	//const static int32_t FRACBITS=12;
 	double a = v0.y - v1.y;
 	double b = v1.x - v0.x;
 	double c = -0.5f * (a * (v0.x + v1.x) + b*(v0.y + v1.y));//其实也就是 x0*y1 - x1*y0
@@ -102,9 +102,9 @@ void init_edge_eqn(struct edge_eqn *edge,vertex2d v0,vertex2d v1)
 	if area<0,说明是back facing，如果开启了back-face culling，不显示
 
 	*/
-	edge->A = (int)(a* (1<<FRACBITS));
-	edge->B = (int)(b* (1<<FRACBITS));
-	edge->C = (int)(c* (1<<FRACBITS));
+	edge->A = (int32_t)(a* (1<<FRACBITS));
+	edge->B = (int32_t)(b* (1<<FRACBITS));
+	edge->C = (int32_t)(c* (1<<FRACBITS));
 	edge->flag = 0;
 	if (edge->A>=0) edge->flag += 8;//y方向上的最大最小值
 	if (edge->B>=0) edge->flag += 1;
@@ -117,7 +117,7 @@ void flip_edge_eqn(struct edge_eqn *edge)
 	edge->C = -edge->C;
 }
 
-int evaluate_edge(struct edge_eqn * edge,int x,int y)
+int32_t evaluate_edge(struct edge_eqn * edge,int32_t x,int32_t y)
 {
 	return (edge->A * x + edge->B * y + edge->C);
 }
@@ -129,8 +129,8 @@ void DrawTriangleWithEdgeEquation(vertex2d v0,vertex2d v1,vertex2d v2,ARGB color
 	init_edge_eqn(&edge1,v1,v2);
 	init_edge_eqn(&edge2,v2,v0);
 
-	int area = edge0.C + edge1.C + edge2.C;
-	int back_face_culling = 0;
+	int32_t area = edge0.C + edge1.C + edge2.C;
+	int32_t back_face_culling = 0;
 	if (area == 0)
 	{
 		return;
@@ -144,49 +144,49 @@ void DrawTriangleWithEdgeEquation(vertex2d v0,vertex2d v1,vertex2d v2,ARGB color
 		flip_edge_eqn(&edge2);
 	}
 
-	int xMin,xMax,yMin,yMax;
-	xMin = (int)MACRO_MIN3(v0.x,v1.x,v2.x);
-	xMax = (int)MACRO_MAX3(v0.x,v1.x,v2.x);
+	int32_t xMin,xMax,yMin,yMax;
+	xMin = (int32_t)MACRO_MIN3(v0.x,v1.x,v2.x);
+	xMax = (int32_t)MACRO_MAX3(v0.x,v1.x,v2.x);
 
-	yMin = (int)MACRO_MIN3(v0.y,v1.y,v2.y);
-	yMax = (int)MACRO_MAX3(v0.y,v1.y,v2.y);
+	yMin = (int32_t)MACRO_MIN3(v0.y,v1.y,v2.y);
+	yMax = (int32_t)MACRO_MAX3(v0.y,v1.y,v2.y);
 
-	int A0 = edge0.A;
-	int A1 = edge1.A;
-	int A2 = edge2.A;
+	int32_t A0 = edge0.A;
+	int32_t A1 = edge1.A;
+	int32_t A2 = edge2.A;
 
-	int B0 = edge0.B;
-	int B1 = edge1.B;
-	int B2 = edge2.B;
+	int32_t B0 = edge0.B;
+	int32_t B1 = edge1.B;
+	int32_t B2 = edge2.B;
 
-	int C0 = edge0.C;
-	int C1 = edge1.C;
-	int C2 = edge2.C;
+	int32_t C0 = edge0.C;
+	int32_t C1 = edge1.C;
+	int32_t C2 = edge2.C;
 
-	int t0 = A0*xMin + B0*yMin + C0;
-	int t1 = A1*xMin + B1*yMin + C1;
-	int t2 = A2*xMin + B2*yMin + C2;
+	int32_t t0 = A0*xMin + B0*yMin + C0;
+	int32_t t1 = A1*xMin + B1*yMin + C1;
+	int32_t t2 = A2*xMin + B2*yMin + C2;
 
 	interpolate_eqn inter;
 	init_interpolate_eqn(&inter,v0,v1,v2);
 	//printf("x0=%f, y0=%f \n",v0.x,v0.y);
 	//printf("x1=%f, y1=%f \n",v1.x,v1.y);
 	//printf("x2=%f, y2=%f \n\n",v2.x,v2.y);
-	for (int y=yMin;y<=yMax;y++)
+	for (int32_t y=yMin;y<=yMax;y++)
 	{
-		int e0 = t0;
-		int e1 = t1;
-		int e2 = t2;
-		int xflag = 0;
-		for (int x = xMin; x <= xMax; x++) {
+		int32_t e0 = t0;
+		int32_t e1 = t1;
+		int32_t e2 = t2;
+		int32_t xflag = 0;
+		for (int32_t x = xMin; x <= xMax; x++) {
 			if ((e0|e1|e2) >= 0) {      // all 3 edges must be >= 0
 				//差值三个颜色分量
-				int a = (inter.interpolation_alpha_a *x + inter.interpolation_alpha_b*y + inter.interpolation_alpha_c)*inter.interpolate_argb_divider_reciprocal;
-				int r = (inter.interpolation_red_a*x + inter.interpolation_red_b*y + inter.interpolation_red_c)*inter.interpolate_argb_divider_reciprocal;
-				int g = (inter.interpolation_greed_a*x + inter.interpolation_greed_b*y + inter.interpolation_greed_c)*inter.interpolate_argb_divider_reciprocal;
-				int b = (inter.interpolation_blue_a*x + inter.interpolation_blue_b*y + inter.interpolation_blue_c)*inter.interpolate_argb_divider_reciprocal;
+				int32_t a = (inter.interpolation_alpha_a *x + inter.interpolation_alpha_b*y + inter.interpolation_alpha_c)*inter.interpolate_argb_divider_reciprocal;
+				int32_t r = (inter.interpolation_red_a*x + inter.interpolation_red_b*y + inter.interpolation_red_c)*inter.interpolate_argb_divider_reciprocal;
+				int32_t g = (inter.interpolation_greed_a*x + inter.interpolation_greed_b*y + inter.interpolation_greed_c)*inter.interpolate_argb_divider_reciprocal;
+				int32_t b = (inter.interpolation_blue_a*x + inter.interpolation_blue_b*y + inter.interpolation_blue_c)*inter.interpolate_argb_divider_reciprocal;
 				DrawPixel(x,y,ARGB(a,r,g,b));
-				/*int color = interpolate_color_triangle(x,y,v0,v1,v2);
+				/*int32_t color = interpolate_color_triangle(x,y,v0,v1,v2);
 				DrawPixel(x,y,color);*/
 				xflag++;
 			} else if (xflag != 0) break;
@@ -264,14 +264,14 @@ B=(P*U-R*T)*idet
 C=z0-A*x0-B*x0
  */
 
-ARGB interpolate_color_triangle(int x,int y,vertex2d v0,vertex2d v1,vertex2d v2)
+ARGB interpolate_color_triangle(int32_t x,int32_t y,vertex2d v0,vertex2d v1,vertex2d v2)
 {
-	int x0 = v0.x;
-	int y0 = v0.y;
-	int x1 = v1.x;
-	int y1 = v1.y;
-	int x2 = v2.x;
-	int y2 = v2.y;
+	int32_t x0 = v0.x;
+	int32_t y0 = v0.y;
+	int32_t x1 = v1.x;
+	int32_t y1 = v1.y;
+	int32_t x2 = v2.x;
+	int32_t y2 = v2.y;
 	//三个顶点的alpha分量
 	ARGB a0 = GET_ARGB_A(v0.color);
 	ARGB a1 = GET_ARGB_A(v1.color);
@@ -292,55 +292,55 @@ ARGB interpolate_color_triangle(int x,int y,vertex2d v0,vertex2d v1,vertex2d v2)
 	ARGB b1 = GET_ARGB_B(v1.color);
 	ARGB b2 = GET_ARGB_B(v2.color);
 	//下面几个临时变量减少几次乘法操作
-	int x0_y1 = x0*y1;
-	int x1_y2 = x1*y2;
-	int x2_y0 = x2*y0;
+	int32_t x0_y1 = x0*y1;
+	int32_t x1_y2 = x1*y2;
+	int32_t x2_y0 = x2*y0;
 	
-	int x2_y1 = x2*y1;
-	int x0_y2 = x0*y2;
-	int x1_y0 = x1*y0;
+	int32_t x2_y1 = x2*y1;
+	int32_t x0_y2 = x0*y2;
+	int32_t x1_y0 = x1*y0;
 
-	int a = (	( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) )* x - (x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0))*y 
+	int32_t a = (	( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) )* x - (x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0))*y 
 				+ (a0 * (x1_y2 - x2_y1) + a1*(x2_y0 - x0_y2) + a2*(x0_y1 - x1_y0))
 			)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
-	int interpolate_argb_divider = ( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
+	int32_t interpolate_argb_divider = ( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
 
-	int interpolate_argb_divider__ = 1;
-	int interpolation_alpha_a = ( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) )/interpolate_argb_divider;
-	int interpolation_alpha_b = -( x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0))/interpolate_argb_divider;
-	int interpolation_alpha_c = (a0 * (x1_y2 - x2_y1) + a1*(x2_y0 - x0_y2) + a2*(x0_y1 - x1_y0))/interpolate_argb_divider;
+	int32_t interpolate_argb_divider__ = 1;
+	int32_t interpolation_alpha_a = ( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) )/interpolate_argb_divider;
+	int32_t interpolation_alpha_b = -( x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0))/interpolate_argb_divider;
+	int32_t interpolation_alpha_c = (a0 * (x1_y2 - x2_y1) + a1*(x2_y0 - x0_y2) + a2*(x0_y1 - x1_y0))/interpolate_argb_divider;
 
-	int aa = interpolation_alpha_a*x + interpolation_alpha_b*y + interpolation_alpha_c;
+	int32_t aa = interpolation_alpha_a*x + interpolation_alpha_b*y + interpolation_alpha_c;
 	aa = aa/interpolate_argb_divider;
 	//alpha 的差值 a=interpolation_alpha_a*x + interpolation_alpha_b*y + interpolation_alpha_c;
 	////////////////////////////////////////////////////////////////////////////////////////////
-	int r = (	( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) )* x - (x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0))*y 
+	int32_t r = (	( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) )* x - (x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0))*y 
 	+ (r0 * (x1_y2 - x2_y1) + r1*(x2_y0 - x0_y2) + r2*(x0_y1 - x1_y0))
 	)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
-	int interpolation_red_a = ( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) )/interpolate_argb_divider;
-	int interpolation_red_b = -(x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0))/interpolate_argb_divider;
-	int interpolation_red_c = (r0 * (x1_y2 - x2_y1) + r1*(x2_y0 - x0_y2) + r2*(x0_y1 - x1_y0))/interpolate_argb_divider;
+	int32_t interpolation_red_a = ( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) )/interpolate_argb_divider;
+	int32_t interpolation_red_b = -(x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0))/interpolate_argb_divider;
+	int32_t interpolation_red_c = (r0 * (x1_y2 - x2_y1) + r1*(x2_y0 - x0_y2) + r2*(x0_y1 - x1_y0))/interpolate_argb_divider;
 
-	int rr = interpolation_red_a*x + interpolation_red_b*y + interpolation_red_c;
+	int32_t rr = interpolation_red_a*x + interpolation_red_b*y + interpolation_red_c;
 	rr = rr/interpolate_argb_divider;
 	//red 的差值 a=interpolation_red_a*x + interpolation_red_b*y + interpolation_red_c;
-	int g = (	( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) )* x - (x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0))*y 
+	int32_t g = (	( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) )* x - (x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0))*y 
 	+ (g0 * (x1_y2 - x2_y1) + g1*(x2_y0 - x0_y2) + g2*(x0_y1 - x1_y0))
 	)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
-	int interpolation_greed_a = ( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) )/interpolate_argb_divider;
-	int interpolation_greed_b = -(x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0))/interpolate_argb_divider;
-	int interpolation_greed_c = (g0 * (x1_y2 - x2_y1) + g1*(x2_y0 - x0_y2) + g2*(x0_y1 - x1_y0))/interpolate_argb_divider;
-	int gg = interpolation_greed_a*x + interpolation_greed_b*y + interpolation_greed_c;
+	int32_t interpolation_greed_a = ( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) )/interpolate_argb_divider;
+	int32_t interpolation_greed_b = -(x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0))/interpolate_argb_divider;
+	int32_t interpolation_greed_c = (g0 * (x1_y2 - x2_y1) + g1*(x2_y0 - x0_y2) + g2*(x0_y1 - x1_y0))/interpolate_argb_divider;
+	int32_t gg = interpolation_greed_a*x + interpolation_greed_b*y + interpolation_greed_c;
 	gg = gg/interpolate_argb_divider;
 	//green 的差值 a=interpolation_greed_a*x + interpolation_green_b*y + interpolation_green_c;
 
-	int b = (	( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) )* x - (x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0))*y 
+	int32_t b = (	( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) )* x - (x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0))*y 
 				+ (b0 * (x1_y2 - x2_y1) + b1*(x2_y0 - x0_y2) + b2*(x0_y1 - x1_y0))
 			)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
-	int interpolation_blue_a = ( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) )/interpolate_argb_divider;
-	int interpolation_blue_b = -(x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0))/interpolate_argb_divider;
-	int interpolation_blue_c = (b0 * (x1_y2 - x2_y1) + b1*(x2_y0 - x0_y2) + b2*(x0_y1 - x1_y0))/interpolate_argb_divider;
-	int bb = interpolation_blue_a*x + interpolation_blue_b*y + interpolation_blue_c;
+	int32_t interpolation_blue_a = ( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) )/interpolate_argb_divider;
+	int32_t interpolation_blue_b = -(x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0))/interpolate_argb_divider;
+	int32_t interpolation_blue_c = (b0 * (x1_y2 - x2_y1) + b1*(x2_y0 - x0_y2) + b2*(x0_y1 - x1_y0))/interpolate_argb_divider;
+	int32_t bb = interpolation_blue_a*x + interpolation_blue_b*y + interpolation_blue_c;
 	bb = bb/interpolate_argb_divider;
 	//blue 的差值 a=interpolation_blue_a*x + interpolation_blue_b*y + interpolation_blue_c;
 	ARGB color = ARGB(a,r,g,b);
@@ -349,12 +349,12 @@ ARGB interpolate_color_triangle(int x,int y,vertex2d v0,vertex2d v1,vertex2d v2)
 
 void init_interpolate_eqn( struct interpolate_eqn * inter, vertex2d v0,vertex2d v1,vertex2d v2 )
 {
-	int x0 = v0.x;
-	int y0 = v0.y;
-	int x1 = v1.x;
-	int y1 = v1.y;
-	int x2 = v2.x;
-	int y2 = v2.y;
+	int32_t x0 = v0.x;
+	int32_t y0 = v0.y;
+	int32_t x1 = v1.x;
+	int32_t y1 = v1.y;
+	int32_t x2 = v2.x;
+	int32_t y2 = v2.y;
 	//三个顶点的alpha分量
 	ARGB a0 = GET_ARGB_A(v0.color);
 	ARGB a1 = GET_ARGB_A(v1.color);
@@ -375,47 +375,47 @@ void init_interpolate_eqn( struct interpolate_eqn * inter, vertex2d v0,vertex2d 
 	ARGB b1 = GET_ARGB_B(v1.color);
 	ARGB b2 = GET_ARGB_B(v2.color);
 	//下面几个临时变量减少几次乘法操作
-	int x0_y1 = x0*y1;
-	int x1_y2 = x1*y2;
-	int x2_y0 = x2*y0;
+	int32_t x0_y1 = x0*y1;
+	int32_t x1_y2 = x1*y2;
+	int32_t x2_y0 = x2*y0;
 	
-	int x2_y1 = x2*y1;
-	int x0_y2 = x0*y2;
-	int x1_y0 = x1*y0;
+	int32_t x2_y1 = x2*y1;
+	int32_t x0_y2 = x0*y2;
+	int32_t x1_y0 = x1*y0;
 
-	/*int a = (	( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) )* x - (x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0))*y 
+	/*int32_t a = (	( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) )* x - (x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0))*y 
 				+ (a0 * (x1_y2 - x2_y1) + a1*(x2_y0 - x0_y2) + a2*(x0_y1 - x1_y0))
 			)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );*/
-	int interpolate_argb_divider = ( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
+	int32_t interpolate_argb_divider = ( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );
 	inter->interpolate_argb_divider_reciprocal = 1/(float)interpolate_argb_divider;
-	int interpolation_alpha_a = ( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) );
-	int interpolation_alpha_b = -( x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0));
-	int interpolation_alpha_c = (a0 * (x1_y2 - x2_y1) + a1*(x2_y0 - x0_y2) + a2*(x0_y1 - x1_y0));
+	int32_t interpolation_alpha_a = ( y0*(a2-a1) + y1*(a0-a2) + y2*(a1-a0) );
+	int32_t interpolation_alpha_b = -( x0 * (a2-a1) + x1*(a0 - a2) + x2*(a1-a0));
+	int32_t interpolation_alpha_c = (a0 * (x1_y2 - x2_y1) + a1*(x2_y0 - x0_y2) + a2*(x0_y1 - x1_y0));
 
 	//alpha 的差值 a=interpolation_alpha_a*x + interpolation_alpha_b*y + interpolation_alpha_c;
 
-	/*int r = (	( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) )* x - (x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0))*y 
+	/*int32_t r = (	( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) )* x - (x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0))*y 
 	+ (r0 * (x1_y2 - x2_y1) + r1*(x2_y0 - x0_y2) + r2*(x0_y1 - x1_y0))
 	)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );*/
-	int interpolation_red_a = ( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) );
-	int interpolation_red_b = -(x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0));
-	int interpolation_red_c = (r0 * (x1_y2 - x2_y1) + r1*(x2_y0 - x0_y2) + r2*(x0_y1 - x1_y0));
+	int32_t interpolation_red_a = ( y0*(r2-r1) + y1*(r0-r2) + y2*(r1-r0) );
+	int32_t interpolation_red_b = -(x0 * (r2-r1) + x1*(r0 - r2) + x2*(r1-r0));
+	int32_t interpolation_red_c = (r0 * (x1_y2 - x2_y1) + r1*(x2_y0 - x0_y2) + r2*(x0_y1 - x1_y0));
 	//red 的差值 a=interpolation_red_a*x + interpolation_red_b*y + interpolation_red_c;
 
-	/*int g = (	( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) )* x - (x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0))*y 
+	/*int32_t g = (	( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) )* x - (x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0))*y 
 	+ (g0 * (x1_y2 - x2_y1) + g1*(x2_y0 - x0_y2) + g2*(x0_y1 - x1_y0))
 	)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );*/
-	int interpolation_greed_a = ( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) );
-	int interpolation_greed_b = -(x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0));
-	int interpolation_greed_c = (g0 * (x1_y2 - x2_y1) + g1*(x2_y0 - x0_y2) + g2*(x0_y1 - x1_y0));
+	int32_t interpolation_greed_a = ( y0*(g2-g1) + y1*(g0-g2) + y2*(g1-g0) );
+	int32_t interpolation_greed_b = -(x0 * (g2-g1) + x1*(g0 - g2) + x2*(g1-g0));
+	int32_t interpolation_greed_c = (g0 * (x1_y2 - x2_y1) + g1*(x2_y0 - x0_y2) + g2*(x0_y1 - x1_y0));
 	//green 的差值 a=interpolation_greed_a*x + interpolation_green_b*y + interpolation_green_c;
 
-	/*int b = (	( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) )* x - (x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0))*y 
+	/*int32_t b = (	( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) )* x - (x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0))*y 
 				+ (b0 * (x1_y2 - x2_y1) + b1*(x2_y0 - x0_y2) + b2*(x0_y1 - x1_y0))
 			)/( (x0_y1 - x1_y0) + (x1_y2 - x2_y1) + (x2_y0 - x0_y2) );*/
-	int interpolation_blue_a = ( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) );
-	int interpolation_blue_b = -(x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0));
-	int interpolation_blue_c = (b0 * (x1_y2 - x2_y1) + b1*(x2_y0 - x0_y2) + b2*(x0_y1 - x1_y0));
+	int32_t interpolation_blue_a = ( y0*(b2-b1) + y1*(b0-b2) + y2*(b1-b0) );
+	int32_t interpolation_blue_b = -(x0 * (b2-b1) + x1*(b0 - b2) + x2*(b1-b0));
+	int32_t interpolation_blue_c = (b0 * (x1_y2 - x2_y1) + b1*(x2_y0 - x0_y2) + b2*(x0_y1 - x1_y0));
 
 	inter->interpolation_alpha_a = interpolation_alpha_a;
 	inter->interpolation_alpha_b = interpolation_alpha_b;

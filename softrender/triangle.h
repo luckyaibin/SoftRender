@@ -31,7 +31,7 @@ struct triangle2d{
 struct polygon2d 
 {
 	vertex2d * v_array;
-	int	size;
+	int32_t	size;
 };
 
 //3D点的外积（叉乘、cross product）
@@ -50,37 +50,37 @@ float cross_product(vertex2d v1,vertex2d v2);
 	v2-----v3
 */
 //叉乘算法判断一个点是不是在三角形内部。is_clockwise:-1,三个顶点是逆时针顺序。1，顺时针。0，不知道
-int is_point_in_triangle_by_crossproduct(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int is_clockwise=0);
+int32_t is_point_in_triangle_by_crossproduct(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int32_t is_clockwise=0);
 
 
 //质心算法断一个点是不是在三角形内部
-int is_point_in_triangle_by_barycentric_algo(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int is_clockwise=0);
+int32_t is_point_in_triangle_by_barycentric_algo(vertex2d p,vertex2d v1,vertex2d v2, vertex2d v3,int32_t is_clockwise=0);
 
 
 
 struct edge_eqn{
 	
-	int A,B,C;
-	int flag;
+	int32_t A,B,C;
+	int32_t flag;
 };
 
 //差值方程color(x,y) = A*x + B*y + C
 struct interpolate_eqn{
-	int interpolation_alpha_a;
-	int interpolation_alpha_b;
-	int interpolation_alpha_c;
+	int32_t interpolation_alpha_a;
+	int32_t interpolation_alpha_b;
+	int32_t interpolation_alpha_c;
 
-	int interpolation_red_a;
-	int interpolation_red_b;
-	int interpolation_red_c;
+	int32_t interpolation_red_a;
+	int32_t interpolation_red_b;
+	int32_t interpolation_red_c;
 
-	int interpolation_greed_a;
-	int interpolation_greed_b;
-	int interpolation_greed_c;
+	int32_t interpolation_greed_a;
+	int32_t interpolation_greed_b;
+	int32_t interpolation_greed_c;
 
-	int interpolation_blue_a;
-	int interpolation_blue_b;
-	int interpolation_blue_c;
+	int32_t interpolation_blue_a;
+	int32_t interpolation_blue_b;
+	int32_t interpolation_blue_c;
 
 	float interpolate_argb_divider_reciprocal;
 };
@@ -89,8 +89,8 @@ void init_interpolate_eqn(struct interpolate_eqn * inter, vertex2d v0,vertex2d v
 void init_edge_eqn(struct edge_eqn *edge,vertex2d v0,vertex2d v1);
 
 void flip_edge_eqn(struct edge_eqn *edge);
-int evaluate_edge(struct edge_eqn * edge,int x,int y);
+int32_t evaluate_edge(struct edge_eqn * edge,int32_t x,int32_t y);
 
 void DrawTriangleWithEdgeEquation(vertex2d v0,vertex2d v1,vertex2d v2,ARGB color);
-ARGB interpolate_color_triangle(int x,int y,vertex2d v0,vertex2d v1,vertex2d v2);
+ARGB interpolate_color_triangle(int32_t x,int32_t y,vertex2d v0,vertex2d v1,vertex2d v2);
 #endif
