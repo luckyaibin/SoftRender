@@ -17,15 +17,16 @@ typedef unsigned long long int		uint64_t;
 
 struct FLOAT_FORMAT
 {
-	uint32_t sign:1;
-	uint32_t exponent:8;
 	uint32_t mantissa:23;
+	uint32_t exponent:8;
+	uint32_t sign:1;
 };
 
 union FLOAT_UINT32_UNION
 {
 	float f;
 	uint32_t ui;
+	FLOAT_FORMAT ffmat;
 };
 
 #endif

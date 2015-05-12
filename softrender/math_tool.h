@@ -9,9 +9,57 @@
 
 #define IS_FLOAT_POSITIVE_INFINITE(f) ( IS_FLOAT_INFINITE(f) && ( ((FLOAT_FORMAT*)(&f))->sign == 0))
 
+//判断是不是非规格化浮点数，非规格浮点数的exponent部分是全是0
+//最小的规格化浮点数是FLT_MIN，即1.175494351e-38F:0000 0000 1000 0000 0000 0000 0000 0000
+//-38其实是由指数部分的1，加上127:01111111，得到的10000000:-128，换成10进制为10e-38
+//隐含的右数第23位有效部分为1，
+//最大的非规格化浮点数是
+#define IS_FLOAT_DENORMAL(f) (((FLOAT_FORMAT*)(&f))->exponent == 0x00)
+
 //NaN，not a number，指数全为1，尾数不为0
 #define IS_FLOAT_NAN(f) ( (((FLOAT_FORMAT*)(&f))->exponent == 0xFF) && (((FLOAT_FORMAT*)(&f))->mantissa) )
 
+uint32_t dump_float(float f)
+{
+	FLOAT_UINT32_UNION *fu = (FLOAT_UINT32_UNION*)&f;
+	for (int i=0;i<32;i++)
+	{
+		uint32_t bit = (fu->ui & (1<<(31-i)));
+		printf("%d",bit>0?1:0);
+		if ( (i+1)%4==0)
+		{
+			printf(" ");
+		}
+	}
+	printf("\n");
+	return fu->ui;
+}
+
+float float_from_bit_array(uint32_t bit_arr[],uint32_t size)
+{
+	float res_float = 0.0f;
+	FLOAT_UINT32_UNION *fu = (FLOAT_UINT32_UNION*)&res_float;
+	int32_t index = 0;
+	while (index < size)
+	{
+		uint32_t bit = !!bit_arr[index];
+		fu->ui |= (bit<<(31-index)); 
+		index++;
+	}
+	//printf("得到结果 %5.60f\n",res_float);
+	return res_float;
+}
+/*
+Float value	原始的Hexadecimal	负数则用0x80000000减去原始Hexadecimal				Decimal
+4.20E-45		0x00000003				0x00000003										3
+2.80E-45		0x00000002				0x00000002										2
+1.40E-45		0x00000001				0x00000001										1
+0				0x00000000				0x00000000										0
+-1.40E-45		0x80000001				0xFFFFFFFF										-1
+-2.80E-45		0x80000002				0xFFFFFFFE										-2
+-4.20E-45		0x80000003				0xFFFFFFFD										-3
+*/
+//转换为整数进行比较，如果有浮点数数为负数，转为对应的负正数表示，在相减
 int32_t is_float_equal(float f1,float f2,int32_t maxUlps)
 {
 	if (f1==f2)
@@ -20,13 +68,60 @@ int32_t is_float_equal(float f1,float f2,int32_t maxUlps)
 	}
 	int32_t i1,i2;
 	if (((FLOAT_UINT32_UNION*)(&f1))->ui < 0)
-		i1 = (((FLOAT_UINT32_UNION*)(&f1))->ui)-0x80000000;
+	{
+		i1 = 0x80000000 - (((FLOAT_UINT32_UNION*)(&f1))->ui);
+	}
 	if (((FLOAT_UINT32_UNION*)(&f2))->ui < 0)
-		i2 = (((FLOAT_UINT32_UNION*)(&f2))->ui)-0x80000000;
+	{
+		i2 = 0x80000000 - (((FLOAT_UINT32_UNION*)(&f2))->ui);
+	}
 
 	int intDiff = i1-i2;
 	intDiff = (intDiff>0)?(intDiff):(-intDiff);
+	if (intDiff <= maxUlps)
+	{
+		return 1;
+	}
+	return 0;
+}
+union Float_t
+{
+	Float_t(float num = 0.0f) : f(num) {}
+	// Portable extraction of components.
+	bool Negative() const { return (i >> 31) != 0; }
+	int32_t RawMantissa() const { return i & ((1 << 23) - 1); }
+	int32_t RawExponent() const { return (i >> 23) & 0xFF; }
 
+	int32_t i;
+	float f;
+#ifdef _DEBUG
+	struct
+	{   // Bitfields for exploration. Do not use in production code.
+		uint32_t mantissa : 23;
+		uint32_t exponent : 8;
+		uint32_t sign : 1;
+	} parts;
+#endif
+};
+
+void IterateAllPositiveFloats(float start_float)
+{
+	// Start at zero and print that float.
+	Float_t allFloats;
+	allFloats.f = start_float;
+	printf("%1.8e\n", allFloats.f);
+	dump_float(allFloats.f);
+
+	// Continue through all of the floats, stopping
+	// when we get to positive infinity.
+	while (allFloats.RawExponent() < 255)
+	{
+		// Increment the integer representation
+		// to move to the next float.
+		allFloats.i += 1;
+		printf("%1.8e ", allFloats.f);
+		dump_float(allFloats.f);
+	}
 }
 int32_t get_msb0(uint32_t n)
 {

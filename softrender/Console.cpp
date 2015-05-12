@@ -54,14 +54,30 @@ int32_t Game_Main()
 {
 	
 	StartClock();
+	
+	float flt_min = 1.175494351e-38F;//FLT_MIN
+	printf("%1.18e\n",flt_min);
+	dump_float(flt_min);
+
+	FLOAT_UINT32_UNION *p = (FLOAT_UINT32_UNION*)&flt_min;
+	p->ui |= 0;
+
+	printf("%1.18e\n",flt_min);
+	dump_float(flt_min);
 	 
-	float fa = 3.14343f;
-	float fb = fa;
+	//////////////////
 
-	*((int*)&fb) = (*((int*)&fa) + 1);
+	float res_f = 0.0f;
+	IterateAllPositiveFloats(res_f);
+	dump_float(0.0f);
+	dump_float(1.0f);
+	
 
-	printf("%10.10f \n",fb-fa);
- 
+	
+	dump_float(PI);
+	dump_float(PI/2);
+	dump_float(-PI/2);
+	dump_float(1.40129846e-45);
 	float rad = 30/180.f * 3.1415926;
 	if (IS_FLOAT_INFINITE(rad))
 	{
