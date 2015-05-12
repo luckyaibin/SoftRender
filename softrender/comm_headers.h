@@ -13,9 +13,13 @@
 #define FRACBITS 12
 #define epsilon 0.000001f
 #define equal_zero(f) ( (f) < epsilon && (f)> -epsilon )
-#define PI 3.1415926535f
-#define TWO_PI  6.283185307f
-#define HALF_PI 1.57079632675f
+//#define PI 3.1415926535f
+//#define TWO_PI  6.283185307f
+//#define HALF_PI 1.57079632675f
+
+const static float PI = 3.1415926535f;
+const static float TWO_PI = 6.283185307f;
+const static float HALF_PI = 1.57079632675f;
 
 typedef uint32_t ARGB;
 typedef uint64_t ARGB64;

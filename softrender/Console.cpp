@@ -52,33 +52,14 @@ int32_t Game_Init()
 int32_t g_drawed = 0;
 int32_t Game_Main()
 {
-	
 	StartClock();
-	
-	float flt_min = 1.175494351e-38F;//FLT_MIN
-	printf("%1.18e\n",flt_min);
-	dump_float(flt_min);
+	float flt_epsilon = 1.192092896e-07F;//FLT_EPSILON
 
-	FLOAT_UINT32_UNION *p = (FLOAT_UINT32_UNION*)&flt_min;
-	p->ui |= 0;
-
-	printf("%1.18e\n",flt_min);
-	dump_float(flt_min);
-	 
-	//////////////////
-
-	float res_f = 0.0f;
-	IterateAllPositiveFloats(res_f);
-	dump_float(0.0f);
-	dump_float(1.0f);
-	
-
-	
 	dump_float(PI);
 	dump_float(PI/2);
 	dump_float(-PI/2);
 	dump_float(1.40129846e-45);
-	float rad = 30/180.f * 3.1415926;
+	float rad = 30/180.f * 3.1415926535;
 	if (IS_FLOAT_INFINITE(rad))
 	{
 		int32_t s = ( ((FLOAT_FORMAT*)&rad))->sign;
@@ -92,13 +73,6 @@ int32_t Game_Main()
 	int32_t f_diviedby_g = float(ff) / (fg>>FRACBITS);
 	float converted_value = fixpoint_to_float(f_diviedby_g,FRACBITS);
 
-	for (float f=-100.0f;f<100.0f;f=f+1.0f)
-	{
-		float mod = fmod(f,1.7f);
-		printf("%5.5f\n",mod);
-	}
-	 
-	printf("tan is %5.5f",tan(PI/2));
 	fast_sin(0);
 	fast_sin(PI/2);
 	fast_sin(PI);

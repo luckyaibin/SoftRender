@@ -196,6 +196,7 @@ float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 	//ÕıÏÒÓàÏÒµÄ·ûºÅ
 	int32_t sin_sign = 1;
 	int32_t cos_sign = 1;
+	float old_rad = rad;
 	rad = fmod(rad,TWO_PI);  
 	if (rad < 0)
 	{ 
@@ -208,7 +209,7 @@ float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 		sin_sign = -sin_sign;
 		cos_sign = -cos_sign;
 	}
-	if (rad>=HALF_PI)
+	if (rad> HALF_PI)
 	{
 		rad = rad-HALF_PI;
 		sin_sign = sin_sign*1;
@@ -246,6 +247,8 @@ float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 	if (p_tan)
 		*p_tan = sin_v/cos_v;
 	//rad_by_tan(adjusted_y/adjusted_x);
+	printf("ras %10.40f :\n sinv_v is %3.40f ,\n cos_v is %3.40f\n\n",old_rad,sin_v,cos_v);
+
 	return sin_v;
 }
 

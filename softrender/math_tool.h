@@ -84,6 +84,13 @@ int32_t is_float_equal(float f1,float f2,int32_t maxUlps)
 	}
 	return 0;
 }
+
+uint32_t float_diff_to_ULP(float diff)
+{
+	FLOAT_UINT32_UNION fuu;
+	fuu.f = diff;
+	return fuu.ui;
+}
 union Float_t
 {
 	Float_t(float num = 0.0f) : f(num) {}
