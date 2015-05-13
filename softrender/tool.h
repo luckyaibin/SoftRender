@@ -247,8 +247,8 @@ float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 	if (p_tan)
 		*p_tan = sin_v/cos_v;
 	//rad_by_tan(adjusted_y/adjusted_x);
-	printf("ras %10.40f :\n sinv_v is %3.40f ,\n cos_v is %3.40f\n\n",old_rad,sin_v,cos_v);
-
+	//printf("mine	%10.40f :\n sinv_v is %3.40f ,\n cos_v is %3.40f\n\n",old_rad,sin_v,cos_v);
+	//printf("correct %10.40f :\n sinv_v is %3.40f ,\n cos_v is %3.40f\n\n",old_rad,sin(old_rad),cos(old_rad));
 	return sin_v;
 }
 
