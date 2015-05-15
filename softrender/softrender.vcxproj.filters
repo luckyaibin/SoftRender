@@ -56,9 +56,6 @@
     <ClCompile Include="Console.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="draw.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -69,6 +66,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="triangle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

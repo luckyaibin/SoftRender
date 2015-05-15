@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <iostream>
 #include "tool.h"
-
+#include <math>
 
 
 //ºê¶¨Òå
@@ -53,6 +53,13 @@ int32_t g_drawed = 0;
 int32_t Game_Main()
 {
 	StartClock();
+	float test_abs_f_pos = 32.1f;
+	float test_abs_f_neg = -32.1f;
+	uint32_t test_abs_f_format_pos = ((FLOAT_UINT32_UNION*)&test_abs_f_pos)->ui;
+	uint32_t test_abs_f_format_neg = ((FLOAT_UINT32_UNION*)&test_abs_f_neg)->ui;
+
+	int32_t test_abs = -32;
+	printf("%d",test_abs>>31);
 	float flt_epsilon = 1.192092896e-07F;//FLT_EPSILON
 
 	dump_float(PI);
@@ -64,7 +71,7 @@ int32_t Game_Main()
 	{
 		int32_t s = ( ((FLOAT_FORMAT*)&rad))->sign;
 	}
-	fast_tan(rad);
+	__todo_fast_tan(rad);
 	float f=700.12345f;
 	float g = 9.43f;
 	int32_t ff = float_to_fixpoint(f,FRACBITS);
@@ -73,42 +80,44 @@ int32_t Game_Main()
 	int32_t f_diviedby_g = float(ff) / (fg>>FRACBITS);
 	float converted_value = fixpoint_to_float(f_diviedby_g,FRACBITS);
 
-	fast_sin(0);
-	fast_sin(PI/2);
-	fast_sin(PI);
-	fast_sin(PI*3/2);
-	fast_sin(PI*2);
+	fast_sin_cordic(0);
+	fast_sin_cordic(PI/2);
+	fast_sin_cordic(PI);
+	fast_sin_cordic(PI*3/2);
+	fast_sin_cordic(PI*2);
 
-	fast_sin(-PI/2);
-	fast_sin(-PI);
-	fast_sin(-PI*3/2);
-	fast_sin(-PI*2);
+	fast_sin_cordic(-PI/2);
+	fast_sin_cordic(-PI);
+	fast_sin_cordic(-PI*3/2);
+	fast_sin_cordic(-PI*2);
 
-	fast_sin(PI/4);
-	fast_sin(PI*3/4);
-	fast_sin(PI*5/4);
-	fast_sin(PI*7/4);
+	fast_sin_cordic(PI/4);
+	fast_sin_cordic(PI*3/4);
+	fast_sin_cordic(PI*5/4);
+	fast_sin_cordic(PI*7/4);
 
-	fast_sin(-PI/4);
-	fast_sin(-PI*3/4);
-	fast_sin(-PI*5/4);
-	fast_sin(-PI*7/4);
+	fast_sin_cordic(-PI/4);
+	fast_sin_cordic(-PI*3/4);
+	fast_sin_cordic(-PI*5/4);
+	fast_sin_cordic(-PI*7/4);
 	unsigned long begin_tick = GetTickCount();
-	for ( int32_t i=0;i<100000;i++)
+	for ( int32_t i=0;i<100000000;i++)
 	{
-		fast_sin((float)i);
+		int32_t y = ((i)>>31);
+		int32_t absv = i^y - y;
+		//((x)^((x)>>31) - ((x)>>31))
 	}
 	unsigned long end_tick = GetTickCount();
 
 	printf("sin time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,sin(rad));
 	begin_tick = GetTickCount();
-	for ( int32_t i=0;i<100000;i++)
+	for ( int32_t i=0;i<100000000;i++)
 	{
-		fast_tan_fix_point_18((float)i);
+		int32_t absv = abs(i);
 	}
 	end_tick = GetTickCount();
 
-	printf("fast_tan2 time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,fast_tan_fix_point_18(rad));
+	printf("fast_tan2 time consumed .. %d,value is %5.5f\n",end_tick - begin_tick,fast_sin_cos_fix_point_18(rad));
  
 	//DrawTriangleWithEdgeEquation
 	for(int32_t i=0;i<1000;i++)

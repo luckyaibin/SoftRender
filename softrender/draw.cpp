@@ -312,5 +312,8 @@ void drawTriangle(vertex2d v1,vertex2d v2,vertex2d v3,ARGB color)
 		fillTopFlatTriangle(vt2,vt4,vt3,color);
 	}
 }
+static inline void test()
+{
 
+}
 

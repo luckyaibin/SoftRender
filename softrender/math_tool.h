@@ -19,6 +19,8 @@
 //NaN，not a number，指数全为1，尾数不为0
 #define IS_FLOAT_NAN(f) ( (((FLOAT_FORMAT*)(&f))->exponent == 0xFF) && (((FLOAT_FORMAT*)(&f))->mantissa) )
 
+#define ABS(x) (x>0)?(x):(-x)
+
 uint32_t dump_float(float f)
 {
 	FLOAT_UINT32_UNION *fu = (FLOAT_UINT32_UNION*)&f;

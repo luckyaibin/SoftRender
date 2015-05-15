@@ -4,14 +4,11 @@
 #include "math_tool.h"
 #include <math.h>
 
-
 /*
 (x0,y0)的向量逆时针旋转theta之后为(x1,y1)
 其中:
 x1 = x0*cos(θ) - y0*sin(θ)
 y1 = x0*sin(θ) + y0*cos(θ)
-
-
 
 x1 = cos(θ)*(	 x0				-		y0*tan(θ)	)
 y1 = cos(θ)*(	 x0*tan(θ)		+		y0			）
@@ -143,24 +140,9 @@ float cos_table[] =
 	0.99999999999818,
 	0.99999999999955,
 };
-
-void dump_triangle_value(float rad)
+//最后需要矫正来得到正确的浮点数x和y值(rad是0 ~ PI/2)
+float __todo_fast_tan(float rad)
 {
-	float pi = 3.14159265335f;
-	printf("弧度:%5.5f,角度:%5.5f°,sin:%5.5f,cos:%5.5f,tan:%5.5f,atan:%5.5f\n",rad,rad/pi*180,sin(rad),cos(rad),tan(rad),atan(rad));
-}
-//根据tan值得到弧度值
-float rad_by_tan(float tan_value)
-{
-	float pi = 3.14159265335f;
-	float rad = atan(tan_value);
-	printf("当前弧度为:%5.5f,角度为:%5.5f\n",rad,rad/pi*180);
-	return rad;
-}
-//最后需要矫正来得到正确的浮点数x和y值
-float fast_tan(float rad)
-{
-	dump_triangle_value(rad);
 	float z = 0;
 	float curr_x = 1;
 	float curr_y = 0;
@@ -172,7 +154,6 @@ float fast_tan(float rad)
 	{
 		float x = curr_x  - d*curr_y*inverse_two_power[iter];
 		float y = d*curr_x*inverse_two_power[iter] + curr_y;
-		rad_by_tan(y/x);
 		z = z + d*atan_rad_table[iter];
 		curr_x = x;
 		curr_y = y;
@@ -186,12 +167,11 @@ float fast_tan(float rad)
 	}
 	float adjusted_x = k_accu_table[20] * curr_x;
 	float adjusted_y = k_accu_table[20] * curr_y;
-	rad_by_tan(adjusted_y/adjusted_x);
 	return 0.0f;
 }
 
 //最后不需要矫正的浮点数xy的值，因为初始化的时候x已经被乘以了最后的矫正值
-float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
+float fast_sin_cordic(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 {
 	//正弦余弦的符号
 	int32_t sin_sign = 1;
@@ -252,8 +232,8 @@ float fast_sin(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 	return sin_v;
 }
 
-//定点数版本
-float fast_tan_fix_point_18(float float_rad)
+//定点数版本的CORDIC算法float_rad属于 :0~PI/2
+float fast_sin_cos_fix_point_18(float float_rad)
 {
 	//这些都是浮点数左移了18bit之后的定点数
 	int32_t k_accu_table[21] = {
@@ -348,43 +328,33 @@ float fast_tan_fix_point_18(float float_rad)
 	return f_sin_v;
 }
 
+//角度x: 0 ~ PI
+float fast_sin_parabola__(float x)
+{
+	float y = x*(const_fast_sin_4_d_pi - const_fast_sin_4_d_pi2*x);
+	y = y*(const_fast_sin_Q + const_fast_sin_P*y);
+	return y;
+}
 
-//http://www.fx114.net/qa-171-97060.aspx
-double my_atan4(double x, double y)  
-{  
-	const double tangent[] = {1.0, 1 / 2.0, 1 / 4.0, 1 / 8.0, 1 / 16.0,  
-		1 / 32.0, 1 / 64.0, 1 / 128.0, 1 / 256.0, 1 / 512.0,  
-		1 / 1024.0, 1 / 2048.0, 1 / 4096.0, 1 / 8192.0, 1 / 16384.0  
-	};  
-	const double angle[] = {45.0, 26.565051177078, 14.0362434679265, 7.1250163489018, 3.57633437499735,  
-		1.78991060824607, 0.8951737102111, 0.4476141708606, 0.2238105003685, 0.1119056770662,  
-		0.0559528918938, 0.027976452617, 0.01398822714227, 0.006994113675353, 0.003497056850704  
-	};  
+float fast_sin()
+{
+	return 0;
+}
 
-	int32_t i = 0;  
-	double x_new, y_new;  
-	double angleSum = 0.0;  
 
-	for(i = 0; i < 15; i++)  
-	{  
-		if(y > 0)  
-		{  
-			x_new = x + y * tangent[i];  
-			y_new = y - x * tangent[i];  
-			x = x_new;  
-			y = y_new;  
-			angleSum += angle[i];  
-		}  
-		else  
-		{  
-			x_new = x - y * tangent[i];  
-			y_new = y + x * tangent[i];  
-			x = x_new;  
-			y = y_new;  
-			angleSum -= angle[i];  
-		}  
-		printf("Debug: i = %d angleSum = %f, angle = %f, ρ = %f\n", i, angleSum, angle[i], hypot(x, y));  
-	}  
-	return angleSum;  
-}  
+
+//from http://forum.devmaster.net/t/fast-and-accurate-sine-cosine/9648/63
+//Andy201
+inline float fastAcos(float x)
+{
+	return sqrt(1-x)*(1.5707963267948966192313216916398f + x*(-0.213300989f + x*(0.077980478f + x*-0.02164095f)));
+}
+
+inline float mod_pi(float x)
+{
+	const float pi = 3.14159265f;
+	float x1 = x * (1.0f / pi);
+	return pi * (x1 - (int)x1);
+}
+
 #endif

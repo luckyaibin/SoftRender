@@ -26,6 +26,7 @@ union FLOAT_UINT32_UNION
 {
 	float f;
 	uint32_t ui;
+	int32_t i;
 	FLOAT_FORMAT ffmat;
 };
 

@@ -21,6 +21,13 @@ const static float PI = 3.1415926535f;
 const static float TWO_PI = 6.283185307f;
 const static float HALF_PI = 1.57079632675f;
 
+//用抛物线近似sin 曲线所用到的常量
+/**/
+const float const_fast_sin_4_d_pi = 4/PI;
+const float const_fast_sin_4_d_pi2 = 4/(PI*PI);
+const float const_fast_sin_Q =0.775;
+const float const_fast_sin_P =0.225;
+
 typedef uint32_t ARGB;
 typedef uint64_t ARGB64;
 #endif
