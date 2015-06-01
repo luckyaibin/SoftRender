@@ -51,6 +51,9 @@
     <ClInclude Include="base_type.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="quaternion.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp">

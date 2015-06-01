@@ -352,7 +352,7 @@ inline float fastAcos(float x)
 
 inline float mod_pi(float x)
 {
-	const float pi = 3.14159265f;
+	const float pi = PI;
 	float x1 = x * (1.0f / pi);
 	return pi * (x1 - (int)x1);
 }
