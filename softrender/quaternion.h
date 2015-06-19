@@ -1,4 +1,34 @@
 ﻿#include <math.h>
+#include "matrix.h"
+struct complex_number
+{
+	float r;
+	float i;
+};
+
+
+complex_number complex_number_i = {0,1};
+
+complex_number complex_number_div(complex_number c,float d)
+{
+	c.r = c.r/d;
+	c.i = c.i/d;
+	return c;
+}
+
+complex_number complex_number_mul(complex_number c1,complex_number c2)
+{
+	complex_number result;
+	result.r = c1.r*c2.r - c1.i*c2.i;
+	result.i = c1.r*c2.i + c1.i*c2.r;
+	return result;
+}
+
+void complex_number_dump(complex_number c)
+{
+	printf("t:%f,i:%f\n",c.r,c.i);
+}
+
 /*
 https://www.youtube.com/watch?v=uRKZnFAR7yw
 FamousMathProbs13a: The rotation problem and Hamilton's discovery of quaternions I 
@@ -96,11 +126,7 @@ if z = a+bi,w = c+di, v = x+yi
 
 // z = u + i*v;
 // order pair of numbers(u,v)
-struct complex_number
-{
-	float u;
-	float v;
-};
+
 
 //orderd pair of numbers (t,x,y,z)
 /*
@@ -237,7 +263,10 @@ quaternion_vector quaternion_vector_cross_mul(const quaternion_vector * q1,const
 struct quaternion
 {
 	float t;
-	quaternion_vector vec_x_y_z;
+	union{
+		quaternion_vector vec_x_y_z;
+		float x,y,z;
+	};
 	//    i j k 
 	//i^2 = j^2 = k^2 = i*j*k = -1
 };
@@ -264,9 +293,9 @@ quaternion quaternion_inverse(const quaternion *q1)
 	float norm = quaternion_norm(q1);
 	quaternion q = quaternion_conjugate(q1);
 	q.t = q.t/norm;
-	q.vec_x_y_z.x = t.vec_x_y_z.x/norm;
-	q.vec_x_y_z.y = t.vec_x_y_z.y/norm;
-	q.vec_x_y_z.z = t.vec_x_y_z.z/norm;
+	q.vec_x_y_z.x = q.vec_x_y_z.x/norm;
+	q.vec_x_y_z.y = q.vec_x_y_z.y/norm;
+	q.vec_x_y_z.z = q.vec_x_y_z.z/norm;
 	return q;
 }
 
@@ -319,6 +348,25 @@ float quaternion_dot_mul(const quaternion * q1,const quaternion * q2)
 	return dot;
 }
 
+//把quaternion转换成矩阵
+Matrix3 quaternion_to_matrix3(quaternion q)
+{
+	Matrix3 m;
+	m.m00 = q.t + q.x * q.x - q.y * q.y - q.z * q.z;
+	m.m01 = 2*q.x*q.y - 2*q.t * q.z;
+	m.m02 = 2*q.x*q.z + 2*q.t*q.y;
+
+	m.m10 = 2*q.x*q.y + 2 * q.t*q.z;
+	m.m11 = q.t*q.t - q.x*q.x + q.y*q.y - q.z*q.z;
+	m.m12 = 2*q.y*q.z - 2*q.t*q.x;
+
+	m.m20 = 2*q.x*q.z - 2*q.t* q.y ;
+	m.m21 = 2*q.y*q.z + 2*q.t*q.x;
+	m.m22 = q.t*q.t - q.x*q.x - q.y*q.y + q.z*q.z;
+	
+	return m;
+}
+
 //根据旋转轴 v(x,y,z) 和half-turn的值h ，求quaternion
 /*
 要求的quaternions为:q = t + v
@@ -357,6 +405,31 @@ quaternion get_quaternion_from_v_rad(quaternion_vector qv,float rad)
 	return q;
 }
 
+//围绕向量（x，y，z）为单位向量，旋转theta角度的quaternion
+quaternion get_quaternion_from_unit_vector_theta(float x,float y,float z,float theta)
+{
+	float half_theta = theta*0.5;
+	quaternion q;
+	q.t = cos(half_theta);
+	q.x = x * sin(half_theta);
+	q.y = y * sin(half_theta);
+	q.z = y * sin(half_theta);
+	return q;
+}
+
+quaternion get_quaternion_from_euler_angle(float angle_a,float angle_b,float angle_c)
+{
+	float half_angle_a = angle_a*0.5;
+	float half_angle_b = angle_b*0.5;
+	float half_angle_c = angle_c*0.5;
+	quaternion qa = {cos(half_angle_a),sin(half_angle_a),0,0};
+	quaternion qb = {cos(half_angle_b),0,sin(half_angle_b),0};
+	quaternion qc = {cos(half_angle_c),0,0,sin(half_angle_c)};
+	
+	qa = quaternion_mul(&qa,&qb);
+	qa = quaternion_mul(&qa,&qc);
+	return qa;
+}
 /*
 quaternion的幂：
 e=1 + 1/1 + 1/1*2 + 1/1*2*3 + 1/1*2*3*4 ...
