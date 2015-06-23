@@ -412,8 +412,8 @@ q^1 = e(ln(q^1) )
 
 */
 
-//q的实数部分为0
-quaternion quaternion_pure_quaternion_exp(quaternion q,float t)
+//q的实数部分为0,q is unit quaternion.
+quaternion quaternion_unit_quaternion_exp(quaternion q,float t)
 {
 	/*
 	q^t = e^(	ln(	q^t	) )
@@ -425,9 +425,21 @@ quaternion quaternion_pure_quaternion_exp(quaternion q,float t)
 		正确性？？？
 	*/
 	quaternion r;
-	
+	float rad_cos = acos(q.t);
+	float rad_sin = asin(1/sqrt(q.x*q.x + q.y*q.y+q.z*q.z));
 	return r;
 }
+
+
+quaternion quaternion_slerp(quaternion q1,quaternion q2,float t)
+{
+	// diff = q1-1 * q2;
+	quaternion diff = quaternion_inverse(&q1);
+	diff = quaternion_mul(&diff,&q2);
+
+	quaternion exponent = quaternion_unit_quaternion_exp()
+}
+
 
 //根据旋转轴 v(x,y,z) 和half-turn的值h ，求quaternion
 /*
