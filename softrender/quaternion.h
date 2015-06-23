@@ -315,7 +315,7 @@ quaternion quaternion_sub(const quaternion * q1,const quaternion * q2)
 	return q;
 }
 
-//quaternion的普通乘法
+//quaternion的普通乘法 q1*q2
 quaternion quaternion_mul(const quaternion * q1,const quaternion * q2)
 {
 	//q = t + v形式的乘法
@@ -331,10 +331,10 @@ quaternion quaternion_mul(const quaternion * q1,const quaternion * q2)
 	
 	//q = (t,x,y,z)形式的乘法
 	quaternion q;
-	q.t = q1->t*q2->t - q1->vec_x_y_z.x * q2->vec_x_y_z.x - q1->vec_x_y_z.y * q2->vec_x_y_z.y - q1->vec_x_y_z.z * q2->vec_x_y_z.z;
-	q.vec_x_y_z.x = q1->t*q2->vec_x_y_z.x + q1->vec_x_y_z.x*q2->t + q1->vec_x_y_z.y*q2->vec_x_y_z.z - q1->vec_x_y_z.z * q2->vec_x_y_z.y;
-	q.vec_x_y_z.y = q1->t*q2->vec_x_y_z.y - q1->vec_x_y_z.x*q2->vec_x_y_z.z + q1->vec_x_y_z.y*q2->t + q1->vec_x_y_z.z*q2->vec_x_y_z.x;
-	q.vec_x_y_z.z = q1->t*q2->vec_x_y_z.z + q1->vec_x_y_z.x*q2->vec_x_y_z.y - q1->vec_x_y_z.y*q2->vec_x_y_z.x + q1->vec_x_y_z.z*q2->t;
+	q.t = q1->t*q2->t - q1->x * q2->x - q1->y * q2->y - q1->z * q2->z;
+	q.x = q1->t*q2->x + q1->x*q2->t + q1->y*q2->z - q1->z * q2->y;
+	q.y = q1->t*q2->y - q1->x*q2->z + q1->y*q2->t + q1->z*q2->x;
+	q.z = q1->t*q2->z + q1->x*q2->y - q1->y*q2->x + q1->z*q2->t;
 	return q;
 }
 
@@ -342,9 +342,9 @@ quaternion quaternion_mul(const quaternion * q1,const quaternion * q2)
 float quaternion_dot_mul(const quaternion * q1,const quaternion * q2)
 {
 	float dot = q1->t * q2->t 
-			+	q1->vec_x_y_z.x * q2->vec_x_y_z.x
-			+	q1->vec_x_y_z.y * q2->vec_x_y_z.y
-			+	q1->vec_x_y_z.z * q2->vec_x_y_z.z;
+			+	q1->x * q2->x
+			+	q1->y * q2->y
+			+	q1->z * q2->z;
 	return dot;
 }
 
@@ -426,7 +426,13 @@ quaternion quaternion_unit_quaternion_exp(quaternion q,float t)
 	*/
 	quaternion r;
 	float rad_cos = acos(q.t);
-	float rad_sin = asin(1/sqrt(q.x*q.x + q.y*q.y+q.z*q.z));
+	float scale = 1/sqrt(q.x*q.x + q.y*q.y+q.z*q.z);
+
+	rad_cos = rad_cos*t;
+	r.t = cos(rad_cos);
+	r.x = sin(rad_cos)*scale*r.x;
+	r.y = sin(rad_cos)*scale*r.y;
+	r.z = sin(rad_cos)*scale*r.z;
 	return r;
 }
 
@@ -437,7 +443,11 @@ quaternion quaternion_slerp(quaternion q1,quaternion q2,float t)
 	quaternion diff = quaternion_inverse(&q1);
 	diff = quaternion_mul(&diff,&q2);
 
-	quaternion exponent = quaternion_unit_quaternion_exp()
+	quaternion exponent = quaternion_unit_quaternion_exp(diff,t);
+
+	quaternion r;
+	r = quaternion_mul(&exponent,&q1);
+	return r;
 }
 
 

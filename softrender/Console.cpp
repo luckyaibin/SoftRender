@@ -54,47 +54,7 @@ int32_t Game_Main()
 {
 	StartClock();
 	quaternion q1,q2;
-	q1.t = -1;
-	q1.vec_x_y_z.x = sqrt(2.0f);
-	q1.vec_x_y_z.y = 1;
-	q1.vec_x_y_z.z = 0;
-
-	q2.t = sqrt(2.0f)/2;
-	q2.vec_x_y_z.x = 0.5f;
-	q2.vec_x_y_z.y = 0;
-	q2.vec_x_y_z.z = 0.5f;
-
-	quaternion q3 = quaternion_mul(&q1,&q2);
-	quaternion q_1 = quaternion_conjugate(&q1);
-	quaternion q4 = quaternion_mul(&q3,&q_1);
- 
-	complex_number c;
-	c.r = 1;
-	c.i = 0;
-
-	complex_number mulp;
-	mulp.r = 0.6276742785f;//sqrt( double( 1-(1/8.0f)*(1/8.0f) ) );
-	mulp.i = 0.125f;
-	float R = sqrt( mulp.r * mulp.r + mulp.i * mulp.i);
-	for (int i=0;i<8;i++)
-	{
-		c = complex_number_mul(c,mulp);
-		float rad = asin(double( c.i / sqrt(c.r*c.r + c.i*c.i) ));
-		float degree = rad/PI * 180;
-		printf("degree is %f \n",degree);
-	}
-
 	
-	complex_number step;
-	step.i = 1/100.0f;
-	
-	step.r = sqrt(1 - step.i*step.i);
-	complex_number cc = {1,0};
-	for ( int n = 0;n<100;n++)
-	{
-		cc = complex_number_mul(cc,step);
-	}
-
 	unsigned long begin_tick = GetTickCount();
 	for ( int32_t i=0;i<10000;i++)
 	{
