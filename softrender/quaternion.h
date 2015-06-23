@@ -370,7 +370,7 @@ Matrix3 quaternion_to_matrix3(quaternion q)
 /*q^t，计算quaternion q 的 t次幂，t为float
 根据欧拉公式（euler's identity:
 
-e^(ix) = cos(x) + sin(x)*i;
+e^(iθ) = cos(θ) + sin(θ)*i;
 
 对于任意的quaternion q = a + xi+yj+zk,都可写成
 q = a + tv(v为单位向量）
@@ -386,7 +386,7 @@ q = cosθ+ sinθ* v = e^(θv);		(I)
 
 e^q = e^(θv) = cosθ + sinθv		(II)
 
-（关于上面这个怎么推导出来的：因为对于实数部分为0的q，肯定可以表示成单位向量θ乘以v，θv，根据euler's identity
+（关于上面这个怎么推导出来的：因为对于实数部分为0的q，肯定可以表示成某一个实数θ乘以单位向量v，θv，根据euler's identity
 对quaternion也成立的上面的公式，可以得到e^q = e^(0+q) = e^(0+θv) = e cosθ + sinθ* v）
 
 
