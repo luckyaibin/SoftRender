@@ -4,7 +4,7 @@
 #include <iostream>
 #include "tool.h"
 #include "quaternion.h"
-
+#include "euler_rotate.h"
 
 //∫Í∂®“Â
 #define WINDOW_CLASS_NAME TEXT("CPPYIN3DWNDCLS")

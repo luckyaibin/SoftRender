@@ -219,44 +219,44 @@ struct quaternion_vector
 	float x,y,z;
 };
 
-quaternion_vector quaternion_vector_add(const quaternion_vector *v1,const quaternion_vector *v2)
+quaternion_vector quaternion_vector_add(quaternion_vector v1,quaternion_vector v2)
 {
 	quaternion_vector q;
-	q.x = v1->x + v2->x;
-	q.y = v1->y + v2->y;
-	q.z = v1->z + v2->z;
+	q.x = v1.x + v2.x;
+	q.y = v1.y + v2.y;
+	q.z = v1.z + v2.z;
 	return q;
 }
 
-quaternion_vector quaternion_vector_sub(const quaternion_vector *v1,const quaternion_vector *v2)
+quaternion_vector quaternion_vector_sub(quaternion_vector v1,quaternion_vector v2)
 {
 	quaternion_vector q;
-	q.x = v1->x - v2->x;
-	q.y = v1->y - v2->y;
-	q.z = v1->z - v2->z;
+	q.x = v1.x - v2.x;
+	q.y = v1.y - v2.y;
+	q.z = v1.z - v2.z;
 	return q;
 }
 
-quaternion_vector quaternion_vector_mul(const quaternion_vector *v1,float num)
+quaternion_vector quaternion_vector_mul(quaternion_vector v1,float num)
 {
 	quaternion_vector q;
-	q.x = v1->x * num;
-	q.y = v1->y * num;
-	q.z = v1->z * num;
+	q.x = v1.x * num;
+	q.y = v1.y * num;
+	q.z = v1.z * num;
 	return q;
 }
 
-float quaternion_vector_dot_mul(const quaternion_vector *v1,const quaternion_vector *v2)
+float quaternion_vector_dot_mul(quaternion_vector v1,quaternion_vector v2)
 {
-	return v1->x*v2->x + v1->y * v2->y + v1->z * v2->z;
+	return v1.x*v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
-quaternion_vector quaternion_vector_cross_mul(const quaternion_vector * q1,const quaternion_vector * q2)
+quaternion_vector quaternion_vector_cross_mul(quaternion_vector q1,quaternion_vector q2)
 {
 	quaternion_vector v;
-	v.x = q1->y * q2->z - q1->z * q2->y;
-	v.y = q1->z * q2->x - q1->x * q2->z;
-	v.z = q1->x * q2->y - q1->y * q2->x;
+	v.x = q1.y * q2.z - q1.z * q2.y;
+	v.y = q1.z * q2.x - q1.x * q2.z;
+	v.z = q1.x * q2.y - q1.y * q2.x;
 	return v;
 }
 
@@ -267,29 +267,33 @@ struct quaternion
 		quaternion_vector vec_x_y_z;
 		float x,y,z;
 	};
+	float norm;
 	//    i j k 
 	//i^2 = j^2 = k^2 = i*j*k = -1
 };
 
-quaternion quaternion_conjugate(const quaternion * q1)
+quaternion quaternion_conjugate(quaternion q1)
 {
 	quaternion q;
-	q.t = q1->t;
-	q.vec_x_y_z.x = -q1->vec_x_y_z.x;
-	q.vec_x_y_z.y = -q1->vec_x_y_z.y;
-	q.vec_x_y_z.z = -q1->vec_x_y_z.z;
+	q.t = q1.t;
+	q.vec_x_y_z.x = -q1.vec_x_y_z.x;
+	q.vec_x_y_z.y = -q1.vec_x_y_z.y;
+	q.vec_x_y_z.z = -q1.vec_x_y_z.z;
 	return q;
 }
 
-float quaternion_norm(const quaternion *q1)
+float quaternion_norm(quaternion q1)
 {
-	return q1->t * q1->t + q1->vec_x_y_z.x * q1->vec_x_y_z.x + q1->vec_x_y_z.y * q1->vec_x_y_z.y + q1->vec_x_y_z.z * q1->vec_x_y_z.z;
+	return q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
 }
 
-quaternion quaternion_inverse(const quaternion *q1)
+quaternion quaternion_inverse(quaternion q1)
 {
 	// q-1 = q* / norm(q)
 	//because q*q-1 = q * q* / norm(q) = (t^2 + x^2 + y^2 + z^2)/norm(q) = 1;
+	//q*q-1 = 1
+	//q-1 = 1/q = cong(q)/(q * conj(q) ) = conj(q)/ norm(q)
+	//对于单位向量q，q-1 = conj(q)
 	float norm = quaternion_norm(q1);
 	quaternion q = quaternion_conjugate(q1);
 	q.t = q.t/norm;
@@ -299,24 +303,24 @@ quaternion quaternion_inverse(const quaternion *q1)
 	return q;
 }
 
-quaternion quaternion_add(const quaternion * q1,const quaternion * q2)
+quaternion quaternion_add(quaternion q1,quaternion q2)
 {
 	quaternion q;
-	q.t = q1->t + q2->t;
-	q.vec_x_y_z = quaternion_vector_add(&q1->vec_x_y_z,&q2->vec_x_y_z);
+	q.t = q1.t + q2.t;
+	q.vec_x_y_z = quaternion_vector_add(q1.vec_x_y_z,q2.vec_x_y_z);
 	return q;
 }
 
-quaternion quaternion_sub(const quaternion * q1,const quaternion * q2)
+quaternion quaternion_sub(quaternion q1,quaternion q2)
 {
 	quaternion q;
-	q.t = q1->t + q2->t;
-	q.vec_x_y_z = quaternion_vector_sub(&q1->vec_x_y_z,&q2->vec_x_y_z);
+	q.t = q1.t + q2.t;
+	q.vec_x_y_z = quaternion_vector_sub(q1.vec_x_y_z,q2.vec_x_y_z);
 	return q;
 }
 
 //quaternion的普通乘法 q1*q2
-quaternion quaternion_mul(const quaternion * q1,const quaternion * q2)
+quaternion quaternion_mul(quaternion q1,quaternion q2)
 {
 	//q = t + v形式的乘法
 	/*quaternion q;
@@ -331,20 +335,20 @@ quaternion quaternion_mul(const quaternion * q1,const quaternion * q2)
 	
 	//q = (t,x,y,z)形式的乘法
 	quaternion q;
-	q.t = q1->t*q2->t - q1->x * q2->x - q1->y * q2->y - q1->z * q2->z;
-	q.x = q1->t*q2->x + q1->x*q2->t + q1->y*q2->z - q1->z * q2->y;
-	q.y = q1->t*q2->y - q1->x*q2->z + q1->y*q2->t + q1->z*q2->x;
-	q.z = q1->t*q2->z + q1->x*q2->y - q1->y*q2->x + q1->z*q2->t;
+	q.t = q1.t*q2.t - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z;
+	q.x = q1.t*q2.x + q1.x*q2.t + q1.y*q2.z - q1.z * q2.y;
+	q.y = q1.t*q2.y - q1.x*q2.z + q1.y*q2.t + q1.z*q2.x;
+	q.z = q1.t*q2.z + q1.x*q2.y - q1.y*q2.x + q1.z*q2.t;
 	return q;
 }
 
 //quaternion的dot product（点乘,把quaternion当成4D vector），其实等于quaternion_mul(q1,quaternion_conjugate(q2))
-float quaternion_dot_mul(const quaternion * q1,const quaternion * q2)
+float quaternion_dot_mul(quaternion q1,quaternion q2)
 {
-	float dot = q1->t * q2->t 
-			+	q1->x * q2->x
-			+	q1->y * q2->y
-			+	q1->z * q2->z;
+	float dot = q1.t * q2.t 
+			+	q1.x * q2.x
+			+	q1.y * q2.y
+			+	q1.z * q2.z;
 	return dot;
 }
 
@@ -365,6 +369,127 @@ Matrix3 quaternion_to_matrix3(quaternion q)
 	m.m22 = q.t*q.t - q.x*q.x - q.y*q.y + q.z*q.z;
 	
 	return m;
+}
+ 
+//把quaternion转换成4x4的矩阵m44，用来和另外一个quaternion转换成的4x1的另外向量m41相乘,得到一个4x1向量
+// q * p -> matrix_q * p
+//把q左乘一个p转换成matrix_q*p
+Matrix4 __quaternion_to_matrix4_left(quaternion q)
+{
+	Matrix4 m;
+	m.m00 = q.t;	m.m01 = - q.x;		m.m02 = -q.y;		m.m03 = -q.z;
+	m.m10 = q.x;	m.m11 = q.t;		m.m12 = -q.z;		m.m13 = q.y;
+	m.m20 = q.y;	m.m21 = q.z;		m.m22 = q.t;		m.m23 = -q.x;
+	m.m30 = q.z;	m.m31 = -q.y;		m.m32 = q.x;		m.m33 = q.t;
+	return m;
+}
+
+//把quaternion转换成4x4的矩阵m44，用来和另外一个quaternion转换成的4x1的另外向量m41相乘,得到一个4x1向量
+//p * q - > marix_q * p
+//把p坐成一个q转换成matrix_q*p，用来对q*p*q-1 的右边进行处理
+Matrix4 __quaternion_to_matrix4_right(quaternion q)
+{
+	Matrix4 m;
+	m.m00 = q.t;	m.m01 = - q.x;		m.m02 = -q.y;		m.m03 = -q.z;
+	m.m10 = q.x;	m.m11 = q.t;		m.m12 = q.z;		m.m13 = -q.y;
+	m.m20 = q.y;	m.m21 = -q.z;		m.m22 = q.t;		m.m23 = q.x;
+	m.m30 = q.z;	m.m31 = q.y;		m.m32 = -q.x;		m.m33 = q.t;
+	return m;
+}
+
+quaternion quaternion_mul_q_p_q_reverse_matrix_form(quaternion q,quaternion p)
+{
+	quaternion q_inverse = quaternion_inverse(q);
+	Matrix4 m_left = __quaternion_to_matrix4_left(q);
+	Matrix4 m_right = __quaternion_to_matrix4_right(q_inverse);
+	Matrix4 m = m_right*m_left;
+
+	vector4 v4;
+	v4.w = p.t;
+	v4.x = p.x;
+	v4.y = p.y;
+	v4.z = p.z;
+
+	vector4 res = m*v4;
+
+	quaternion res_q;
+	res_q.t = res.w;
+	res_q.x = res.x;
+	res_q.y = res.y;
+	res_q.z = res.z;
+	return res_q;
+}
+
+//对于是unit-norm quaternion的q，先求出4x4矩阵，再计算qpq-1
+//unit-norm quaternion的4x4矩阵有一定规律
+quaternion quaternion_mul_unit_norm_q_p_q_reverse_matrix_form(quaternion q,quaternion p)
+{
+	float s = q.t;
+	float x = q.x;
+	float y = q.y;
+	float z = q.z;
+	Matrix4 m(
+		1,			0,				0,				0,
+		0,	1 - 2*(y*y + z*z),	2*(x*y - s*z),	2*(x*z + s*y),
+		0,	2*(x*y + s*z),	1-2*(x*x + z*z),	2*(y*z - s*x),
+		0,	2*(x*y - s*y),	2*(y*z + s*z),		1-2*(x*x + y*y)
+		);
+
+	vector4 v4;
+	v4.w = p.t;
+	v4.x = p.x;
+	v4.y = p.y;
+	v4.z = p.z;
+
+	//用矩阵计算
+	vector4 res = m*v4;
+	//赋值给quaternion
+	quaternion res_q;
+	res_q.t = res.w;
+	res_q.x = res.x;
+	res_q.y = res.y;
+	res_q.z = res.z;
+	return res_q;
+}
+
+//对于unint-norm quaterion q ，把qpq-1里的q 和 q-1转换成两个矩阵相乘的形式3X3矩阵m，用m来和unit quaternion p=0+ li+mj+nk的（l,m,n)向量相乘即可
+Matrix3 __quaternion_mul_q_p_q_reverse_matrix3(quaternion q)
+{
+	/*q = x + xi + yj + zk形式
+	matrix = 
+	2(s^2 + x^2)-1,		2(xy - sz),		2(xz + sy)
+	2(xy + sz),			2(x^2 + y^2)-1,	2(yz - sy)
+	2(xz - sy),			2(yz + sx),		2(s^2 + z^2) - 1
+	*/
+	float s = q.t;
+	float x = q.x;
+	float y = q.y;
+	float z = q.z;
+	Matrix3 m(
+		2*(s*s + x*x)-1,		2*(x*y - s*z),		2*(x*z + s*y),
+		2*(x*y + s*z),			2*(x*x + y*y)-1,	2*(y*z - s*y),
+		2*(x*z - s*y),			2*(y*z + s*x),		2*(s*s + z*z) - 1
+	);
+	return m;
+}
+
+
+
+//把p用qpq-1的形式旋转,q为unit quaternion
+quaternion quaternion_mul_q_p_q_reverse_vector_form(quaternion q,quaternion p)
+{
+	Matrix3 m_for_p;
+	m_for_p.m00 = p.x;
+	m_for_p.m10 = p.y;
+	m_for_p.m20 = p.z;
+	Matrix3 m_mul = __quaternion_mul_q_p_q_reverse_matrix3(q);
+	Matrix3 res = m_mul*m_for_p;
+	quaternion res_q;
+	res_q.t = 0;
+	res_q.x = res.m00;
+	res_q.y = res.m10;
+	res_q.z = res.m20;
+	return res_q;
 }
 
 /*q^t，计算quaternion q 的 t次幂，t为float
@@ -440,13 +565,13 @@ quaternion quaternion_unit_quaternion_exp(quaternion q,float t)
 quaternion quaternion_slerp(quaternion q1,quaternion q2,float t)
 {
 	// diff = q1-1 * q2;
-	quaternion diff = quaternion_inverse(&q1);
-	diff = quaternion_mul(&diff,&q2);
+	quaternion diff = quaternion_inverse(q1);
+	diff = quaternion_mul(diff,q2);
 
 	quaternion exponent = quaternion_unit_quaternion_exp(diff,t);
 
 	quaternion r;
-	r = quaternion_mul(&exponent,&q1);
+	r = quaternion_mul(exponent,q1);
 	return r;
 }
 
@@ -510,8 +635,8 @@ quaternion get_quaternion_from_euler_angle(float angle_a,float angle_b,float ang
 	quaternion qb = {cos(half_angle_b),0,sin(half_angle_b),0};
 	quaternion qc = {cos(half_angle_c),0,0,sin(half_angle_c)};
 	
-	qa = quaternion_mul(&qa,&qb);
-	qa = quaternion_mul(&qa,&qc);
+	qa = quaternion_mul(qa,qb);
+	qa = quaternion_mul(qa,qc);
 	return qa;
 }
 /*

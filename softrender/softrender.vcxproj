@@ -84,6 +84,7 @@
     <ClInclude Include="comm_headers.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="draw.h" />
+    <ClInclude Include="euler_rotate.h" />
     <ClInclude Include="fixepoint.h" />
     <ClInclude Include="math_tool.h" />
     <ClInclude Include="matrix.h" />
