@@ -282,9 +282,20 @@ quaternion quaternion_conjugate(quaternion q1)
 	return q;
 }
 
-float quaternion_norm(quaternion q1)
+float quaternion_get_norm(quaternion q1)
 {
 	return q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
+}
+
+quaternion quaternion_normalize(quaternion q1)
+{
+	float norm = q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
+	float norm_inverse = 1/norm;
+	q1.t *= norm_inverse;
+	q1.x *= norm_inverse;
+	q1.y *= norm_inverse;
+	q1.z *= norm_inverse;
+	return q1;
 }
 
 quaternion quaternion_inverse(quaternion q1)
@@ -294,7 +305,7 @@ quaternion quaternion_inverse(quaternion q1)
 	//q*q-1 = 1
 	//q-1 = 1/q = cong(q)/(q * conj(q) ) = conj(q)/ norm(q)
 	//对于单位向量q，q-1 = conj(q)
-	float norm = quaternion_norm(q1);
+	float norm = quaternion_get_norm(q1);
 	quaternion q = quaternion_conjugate(q1);
 	q.t = q.t/norm;
 	q.vec_x_y_z.x = q.vec_x_y_z.x/norm;
@@ -319,6 +330,15 @@ quaternion quaternion_sub(quaternion q1,quaternion q2)
 	return q;
 }
 
+//quaternion 乘以实数scalar
+quaternion quaternion_mul_scalar(quaternion q1,float scalar)
+{
+	q1.t *= scalar;
+	q1.x *= scalar;
+	q1.y *= scalar;
+	q1.z *= scalar;
+	return q1;
+}
 //quaternion的普通乘法 q1*q2
 quaternion quaternion_mul(quaternion q1,quaternion q2)
 {
@@ -499,15 +519,15 @@ e^(iθ) = cos(θ) + sin(θ)*i;
 
 对于任意的quaternion q = a + xi+yj+zk,都可写成
 q = a + tv(v为单位向量）
-（因为欧拉公式对于实数部分为0的单位quaternion v，v*v = -1,有着和虚数i同样的性质)
+（因为欧拉公式对于实数部分为0的单位quaternion v，v*v = -1,有着和虚数i同样的性质,推导的话参见euler的级数展开)
 
 
 所以对于quaternion的euler's identity为:
-（v为单位向量）
+（v为单位向量；q为unit norm quaternion--长度为1的quaternion）
 
 q = cosθ+ sinθ* v = e^(θv);		(I)
 
-对于实数部分为0的quaternion q，有:
+对于实数部分为0的unit quaternion q，有:
 
 e^q = e^(θv) = cosθ + sinθv		(II)
 
@@ -515,6 +535,7 @@ e^q = e^(θv) = cosθ + sinθv		(II)
 对quaternion也成立的上面的公式，可以得到e^q = e^(0+q) = e^(0+θv) = e cosθ + sinθ* v）
 
 
+对于unit form quaternion q:
 ln(q)	=	ln(cosθ+sinθv)
 		=	ln(e^(θv) )
 		=	θv						(III)
@@ -561,8 +582,10 @@ quaternion quaternion_unit_quaternion_exp(quaternion q,float t)
 	return r;
 }
 
-
-quaternion quaternion_slerp(quaternion q1,quaternion q2,float t)
+/*http://www.3dgep.com/understanding-quaternions/#more-1815 
+使用的是里面的 q' = q1(q1-1 q2 )^t的形式来进行quaternion的slerp
+*/
+quaternion quaternion_slerp1(quaternion q1,quaternion q2,float t)
 {
 	// diff = q1-1 * q2;
 	quaternion diff = quaternion_inverse(q1);
@@ -576,42 +599,54 @@ quaternion quaternion_slerp(quaternion q1,quaternion q2,float t)
 }
 
 
-//根据旋转轴 v(x,y,z) 和half-turn的值h ，求quaternion
-/*
-要求的quaternions为:q = t + v
+/*对于slerp，有通用公式：
+       sin(1-t)θ        sintθ
+vt =   --------- * v1 + ------ * v2
+		sinθ            sinθ
+ 参数q1，q2是unit form quaternion
 
-其中v=(x,y,z)
-	h= |v|/t = sqrt(x^2+y^2+z^2)/t
-所以t= |v|/h = sqrt(x^2+y^2+z^2)/h
+下面代码的形式经过化简其实就能得到 上面的通用公式，
+参见我QQ空间的推导
 */
-quaternion get_quaternion_from_v_halfturn(quaternion_vector qv,float ht)
+
+
+quaternion quaternion_slerp(quaternion v0,quaternion v1,float t)
 {
-	float t = sqrt( qv.x * qv.x + qv.y*qv.y + qv.z * qv.z) / ht;
-	quaternion q;
-	q.t = t;
-	q.vec_x_y_z = qv;
-	return q;
-}
+	//v0 and v1 should be unit length or else
+	// something broken will happen.
 
-//根据旋转轴v(x,y,z) 和 旋转的弧度r，求quaternion !!!!!这里有个问题就是rad不能为pi，这时候tan（pi/2)为正无穷，怎么办？
-//需要做的仅仅是把旋转的弧度r转变为half-turn,然后代入get_quaternion_from_vht
-/*
-cos(r) = (1-h^2)/(1+h^2)
-sin(r) = 2h/(1+h^2)
+	 // Compute the cosine of the angle between the two vectors.
+	float dot = quaternion_dot_mul(v0,v1);
+	quaternion res;
+	const float DOT_TRESHOLD = 0.9995;
+	if (dot > DOT_TRESHOLD)
+	{
+		// result = v0 + t*(v1 dot_mul v0);
+		// If the inputs are too close for comfort, linearly interpolate
+		// and normalize the result.
+		res = quaternion_add(v0,quaternion_mul_scalar(quaternion_mul(v0,v1),t) );
+		res = quaternion_normalize(res);
+		return res;
+	}
+	// Robustness: Stay within domain of acos()
+	if (dot < -1.0f)
+		dot = -1.0f;
+	if(dot > 1.0f)
+		dot = 1.0f;
+	// theta_0 = angle between input vectors
+	float theta_0 = acos(dot);
+	//theta = angle between v0 and result 
+	float theta = theta_0*t;
+	//quaternion v2 = v1 - v0*dot;
+	//v2.normalize();              // { v0, v2 } is now an orthonormal basis
 
-或者直接一点tan(r/2) = h;
-推导出:
+	quaternion v2 = quaternion_sub(v1,quaternion_mul_scalar(v0,dot));
+	v2 = quaternion_normalize(v2);
 
-
-*/
-quaternion get_quaternion_from_v_rad(quaternion_vector qv,float rad)
-{
-	float ht = tan(rad/2);
-	float t = sqrt( qv.x * qv.x + qv.y*qv.y + qv.z * qv.z) / ht;
-	quaternion q;
-	q.t = t;
-	q.vec_x_y_z = qv;
-	return q;
+	quaternion res_1 = quaternion_mul_scalar(v0,cos(theta));
+	quaternion res_2 = quaternion_mul_scalar(v2,sin(theta));
+	quaternion res = quaternion_add(res_1,res_2);
+	return res;
 }
 
 //围绕向量（x，y，z）为单位向量，旋转theta角度的quaternion
@@ -648,3 +683,42 @@ Euler's Identity:
 e(ix) = cos(x) + i*sin(x)
 
 */
+
+
+//根据旋转轴 v(x,y,z) 和half-turn的值h ，求quaternion
+/*
+要求的quaternions为:q = t + v
+
+其中v=(x,y,z)
+	h= |v|/t = sqrt(x^2+y^2+z^2)/t
+所以t= |v|/h = sqrt(x^2+y^2+z^2)/h
+*/
+quaternion __nouse__get_quaternion_from_v_halfturn(quaternion_vector qv,float ht)
+{
+	float t = sqrt( qv.x * qv.x + qv.y*qv.y + qv.z * qv.z) / ht;
+	quaternion q;
+	q.t = t;
+	q.vec_x_y_z = qv;
+	return q;
+}
+
+//根据旋转轴v(x,y,z) 和 旋转的弧度r，求quaternion !!!!!这里有个问题就是rad不能为pi，这时候tan（pi/2)为正无穷，怎么办？
+//需要做的仅仅是把旋转的弧度r转变为half-turn,然后代入get_quaternion_from_vht
+/*
+cos(r) = (1-h^2)/(1+h^2)
+sin(r) = 2h/(1+h^2)
+
+或者直接一点tan(r/2) = h;
+推导出:
+
+
+*/
+quaternion __nouse__get_quaternion_from_v_rad(quaternion_vector qv,float rad)
+{
+	float ht = tan(rad/2);
+	float t = sqrt( qv.x * qv.x + qv.y*qv.y + qv.z * qv.z) / ht;
+	quaternion q;
+	q.t = t;
+	q.vec_x_y_z = qv;
+	return q;
+}
