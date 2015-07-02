@@ -603,7 +603,8 @@ quaternion quaternion_slerp1(quaternion q1,quaternion q2,float t)
        sin(1-t)θ        sintθ
 vt =   --------- * v1 + ------ * v2
 		sinθ            sinθ
- 参数q1，q2是unit form quaternion
+
+参数q1，q2必须是unit form quaternion
 
 下面代码的形式经过化简其实就能得到 上面的通用公式，
 参见我QQ空间的推导
@@ -646,6 +647,39 @@ quaternion quaternion_slerp(quaternion v0,quaternion v1,float t)
 	quaternion res_1 = quaternion_mul_scalar(v0,cos(theta));
 	quaternion res_2 = quaternion_mul_scalar(v2,sin(theta));
 	quaternion res = quaternion_add(res_1,res_2);
+	return res;
+}
+
+float slerp_linear_correction(float t,float alpha,float k,float attenuation)
+{
+	double factor = 1 - attenuation * cos(alpha);
+	factor *= factor;
+	k *= factor;
+
+	float b = 2 * k;
+	float c = -3 * k;
+	float d = 1 + k;
+
+	double tprime_divided_by_t = t * (b*t + c) + d;
+	return tprime_divided_by_t;
+}
+quaternion quaternion_slerp_linear_approximate(quaternion v0,quaternion v1,float t)
+{
+
+	float dot = quaternion_dot_mul(v0,v1);
+	quaternion res;
+	const float DOT_TRESHOLD = 0.9995;
+	if (dot > DOT_TRESHOLD)
+	{
+		// result = v0 + t*(v1 dot_mul v0);
+		// If the inputs are too close for comfort, linearly interpolate
+		// and normalize the result.
+		res = quaternion_add(v0,quaternion_mul_scalar(quaternion_mul(v0,v1),t) );
+		res = quaternion_normalize(res);
+		return res;
+	}
+
+	quaternion res;
 	return res;
 }
 

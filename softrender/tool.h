@@ -350,6 +350,36 @@ inline float fastAcos(float x)
 	return sqrt(1-x)*(1.5707963267948966192313216916398f + x*(-0.213300989f + x*(0.077980478f + x*-0.02164095f)));
 }
 
+inline double isqrt_approx_in_neighborhood(double s, double neighborhood, double scale) {
+	return scale / sqrt(neighborhood) + scale * (s - neighborhood) * (-0.5 * 1.0 / (neighborhood * sqrt(neighborhood)));
+}
+
+double fast_normalize(double s, double neighborhood, double scale) {
+	double factor = 1;
+	const double LIMIT = 0.9995;
+	const double limit2 = LIMIT * LIMIT;
+
+	int ntries = 0;
+
+	while (factor * factor * s < limit2) {
+		double new_factor = fast_normalize(factor * factor * s,
+			neighborhood, scale);
+		factor *= new_factor;
+
+		// 'ntries' is just a mechanism to keep us from infinite-looping
+		// while we are experimenting.
+
+		ntries++;
+		if (ntries > 8) break;
+	}
+
+	return factor;
+}
+//Çó 1/sqrt(v)
+inline float fast_sqrt_inverse(float v)
+{
+
+}
 inline float mod_pi(float x)
 {
 	const float pi = PI;
