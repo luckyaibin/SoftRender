@@ -301,8 +301,7 @@ float quaternion_get_norm(quaternion q1)
 	q1.dump();
 
 	float norm_v = q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
-	printf("111normal is %f \n",norm_v);
-	norm_v = sqrt(norm_v);
+	norm_v = norm_v * InvSqrt(norm_v);
 	printf("222normal is %f \n",norm_v);
 	return norm_v;
 }

@@ -67,30 +67,34 @@ int32_t Game_Main()
 	q2.dump();
 	q2.t = cos(r2);
 	q2.dump();
-	q2.x = sin(r2)*sqrt(1/9.0f);
+	q2.x = sin(r2)*sqrt(1/81.0f);
 	q2.dump();
-	q2.y = sin(r2)*sqrt(4/9.0f);
+	q2.y = sin(r2)*sqrt(16/81.0f);
 	q2.dump();
-	q2.z = sin(r2)*sqrt(8/9.0f);
+	q2.z = sin(r2)*sqrt(64/81.0f);
 	q2.dump();
 	
 	printf("%f	",sqrt(1/81.0f));
 	printf("%f	",sin(r2));
-	printf("%f	",sqrt(4/81.0f));
+	printf("%f	",sqrt(16/81.0f));
 	printf("%f	",sin(r2));
-	printf("%f	",sqrt(8/81.0f));
+	printf("%f	",sqrt(64/81.0f));
 	printf("%f	",sin(r2));
 
 
 	printf("%f,		\n",quaternion_get_norm(q1));
 	printf("%f,		\n",quaternion_get_norm(q2));
 
-	quaternion slerped_q;
+	quaternion slerped_q=q1;
 	float inter_t = 0;
-
+	quaternion pre_slerped_q = q1;
 	for(inter_t=0;inter_t<1.0f;)
 	{
+		
 		slerped_q = quaternion_slerp(q1,q2,inter_t);
+		float diff_rad = acos(quaternion_dot_mul(slerped_q,pre_slerped_q));
+		printf("diff rad :  %f \n",diff_rad);
+		pre_slerped_q = slerped_q;
 		float acos_angle = acos(slerped_q.t);
 		printf("½Ç¶È%f,t:%f,x:%f,y:%f,z:%f\n",acos_angle,slerped_q.t,slerped_q.x,slerped_q.y,slerped_q.z);
 		inter_t+=0.01f;

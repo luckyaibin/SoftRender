@@ -375,10 +375,15 @@ double fast_normalize(double s, double neighborhood, double scale) {
 
 	return factor;
 }
-//Çó 1/sqrt(v)
-inline float fast_sqrt_inverse(float v)
-{
-
+//Çó 1/sqrt(v)http://www.matrix67.com/data/InvSqrt.pdf
+inline float InvSqrt(float x)
+{ 
+	float xhalf = 0.5f*x;
+	int i = *(int*)&x;       // get bits for floating value
+	i = 0x5f375a86- (i>>1);  // gives initial guess y0
+	x = *(float*)&i;         // convert bits back to float
+	x = x*(1.5f-xhalf*x*x);  // Newton step, repeating increases accuracy
+	return x;
 }
 inline float mod_pi(float x)
 {
