@@ -264,10 +264,24 @@ struct quaternion
 {
 	float t;
 	union{
+		struct
+		{ 
+			float x,y,z;
+		};
 		quaternion_vector vec_x_y_z;
-		float x,y,z;
 	};
-	float norm;
+	quaternion():t(0),x(0),y(0),z(0){};
+	quaternion(float t,float x,float y,float z){
+		this->t = t;
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	};
+	void dump()
+	{
+		printf("t:%f,x:%f,y:%f,z:%f \n",t,x,y,z);
+		printf("%d,%d\n",sizeof(quaternion::vec_x_y_z),sizeof(quaternion));
+	}
 	//    i j k 
 	//i^2 = j^2 = k^2 = i*j*k = -1
 };
@@ -284,13 +298,19 @@ quaternion quaternion_conjugate(quaternion q1)
 
 float quaternion_get_norm(quaternion q1)
 {
-	return q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
+	q1.dump();
+
+	float norm_v = q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
+	printf("111normal is %f \n",norm_v);
+	norm_v = sqrt(norm_v);
+	printf("222normal is %f \n",norm_v);
+	return norm_v;
 }
 
 quaternion quaternion_normalize(quaternion q1)
 {
 	float norm = q1.t * q1.t + q1.x * q1.x + q1.y * q1.y + q1.z * q1.z;
-	float norm_inverse = 1/norm;
+	float norm_inverse = 1/sqrt(norm);
 	q1.t *= norm_inverse;
 	q1.x *= norm_inverse;
 	q1.y *= norm_inverse;
@@ -325,7 +345,7 @@ quaternion quaternion_add(quaternion q1,quaternion q2)
 quaternion quaternion_sub(quaternion q1,quaternion q2)
 {
 	quaternion q;
-	q.t = q1.t + q2.t;
+	q.t = q1.t - q2.t;
 	q.vec_x_y_z = quaternion_vector_sub(q1.vec_x_y_z,q2.vec_x_y_z);
 	return q;
 }
@@ -646,7 +666,7 @@ quaternion quaternion_slerp(quaternion v0,quaternion v1,float t)
 
 	quaternion res_1 = quaternion_mul_scalar(v0,cos(theta));
 	quaternion res_2 = quaternion_mul_scalar(v2,sin(theta));
-	quaternion res = quaternion_add(res_1,res_2);
+	res = quaternion_add(res_1,res_2);
 	return res;
 }
 
@@ -679,7 +699,7 @@ quaternion quaternion_slerp_linear_approximate(quaternion v0,quaternion v1,float
 		return res;
 	}
 
-	quaternion res;
+	 
 	return res;
 }
 
@@ -700,9 +720,9 @@ quaternion get_quaternion_from_euler_angle(float angle_a,float angle_b,float ang
 	float half_angle_a = angle_a*0.5;
 	float half_angle_b = angle_b*0.5;
 	float half_angle_c = angle_c*0.5;
-	quaternion qa = {cos(half_angle_a),sin(half_angle_a),0,0};
-	quaternion qb = {cos(half_angle_b),0,sin(half_angle_b),0};
-	quaternion qc = {cos(half_angle_c),0,0,sin(half_angle_c)};
+	quaternion qa(cos(half_angle_a),sin(half_angle_a),0,0);
+	quaternion qb(cos(half_angle_b),0,sin(half_angle_b),0);
+	quaternion qc(cos(half_angle_c),0,0,sin(half_angle_c));
 	
 	qa = quaternion_mul(qa,qb);
 	qa = quaternion_mul(qa,qc);

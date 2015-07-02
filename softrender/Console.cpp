@@ -52,9 +52,50 @@ int32_t Game_Init()
 int32_t g_drawed = 0;
 int32_t Game_Main()
 {
+	 
 	StartClock();
-	quaternion q1,q2;
+	quaternion q1;
+	quaternion q2;
+	float r1= PI;
+	float r2 = PI/2;
+
+	q1.t = cos(r1);
+	q1.x = sin(r1)*sqrt(1/9.0f);
+	q1.y = sin(r1)*sqrt(4/9.0f);
+	q1.z = sin(r1)*sqrt(4/9.0f);
+
+	q2.dump();
+	q2.t = cos(r2);
+	q2.dump();
+	q2.x = sin(r2)*sqrt(1/9.0f);
+	q2.dump();
+	q2.y = sin(r2)*sqrt(4/9.0f);
+	q2.dump();
+	q2.z = sin(r2)*sqrt(8/9.0f);
+	q2.dump();
 	
+	printf("%f	",sqrt(1/81.0f));
+	printf("%f	",sin(r2));
+	printf("%f	",sqrt(4/81.0f));
+	printf("%f	",sin(r2));
+	printf("%f	",sqrt(8/81.0f));
+	printf("%f	",sin(r2));
+
+
+	printf("%f,		\n",quaternion_get_norm(q1));
+	printf("%f,		\n",quaternion_get_norm(q2));
+
+	quaternion slerped_q;
+	float inter_t = 0;
+
+	for(inter_t=0;inter_t<1.0f;)
+	{
+		slerped_q = quaternion_slerp(q1,q2,inter_t);
+		float acos_angle = acos(slerped_q.t);
+		printf("½Ç¶È%f,t:%f,x:%f,y:%f,z:%f\n",acos_angle,slerped_q.t,slerped_q.x,slerped_q.y,slerped_q.z);
+		inter_t+=0.01f;
+	}
+
 	unsigned long begin_tick = GetTickCount();
 	for ( int32_t i=0;i<10000;i++)
 	{
