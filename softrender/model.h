@@ -12,14 +12,14 @@ struct triangle_type
 	int vertex_index[3];//三个顶点的索引
 };
 
-struct Model{
+struct Object_Type{
 	vector3 world_coord;//物体在世界坐标系的坐标
 	vertex3d vertex_data_local[MAX_OBJECT_VERTICES];//顶点，每个顶点坐标是相对于物体坐标
 	vertex3d vertex_data_transformed[MAX_OBJECT_VERTICES];
 
 	int triangle_count;//三角形数量
 	triangle_type triangle_list[MAX_OBJECT_TRIANGLES];//三角形列表
-};
+}Object,*Ojbect_Ptr;
 
 
 
