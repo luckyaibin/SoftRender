@@ -5,7 +5,7 @@
 #include "tool.h"
 #include "quaternion.h"
 #include "euler_rotate.h"
-
+#include "model.h"
 //∫Í∂®“Â
 #define WINDOW_CLASS_NAME TEXT("CPPYIN3DWNDCLS")
 #define WINDOW_TITLE TEXT("engine")

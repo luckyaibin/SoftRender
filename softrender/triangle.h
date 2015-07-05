@@ -3,10 +3,12 @@
 #include "vector.h"
 #include "comm_headers.h"
 
+//三角形顶点的定义，里面的v0等是3d坐标
 struct vertex3d{
 	float x,y,z;
 	ARGB color;
 };
+//三角形的定义，里面包含三个顶点
 struct triangle3d{
 	vertex3d a,b,c;
 	vector3 n;
