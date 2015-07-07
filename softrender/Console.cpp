@@ -54,6 +54,39 @@ int32_t Game_Main()
 {
 	 
 	StartClock();
+
+	Object obj;
+	obj.vertex_count = 4;
+	//obj.triangle_list[0] = 
+	vertex3d *v = new vertex3d();
+	v->x = 0;
+	v->y = 1;
+	v->z = 0;
+	v->color = RGB(255,0,0);
+	obj.vertex_data_local[0] = *v;
+
+	v = new vertex3d();
+	v->x = -1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(0,255,0);
+	obj.vertex_data_local[1] = *v;
+
+	v = new vertex3d();
+	v->x = 1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(0,0,255);
+	obj.vertex_data_local[2] = *v;
+
+	v = new vertex3d();
+	v->x = 0;
+	v->y = 0;
+	v->z = 2;
+	v->color = RGB(0,0,100);
+	obj.vertex_data_local[3] = *v;
+
+
 	Matrix3 m(	1,2,3,
 				4,5,6,
 				7,8,9);

@@ -10,7 +10,7 @@ struct vertex3d{
 	ARGB color;
 };
 //三角形的定义，里面包含三个顶点
-struct triangle3d{
+struct triangle3d_vertex{
 	vertex3d a,b,c;
 	vector3 n;
 };

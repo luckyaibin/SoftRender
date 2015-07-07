@@ -7,20 +7,23 @@
 #include <fstream>
 #define MAX_OBJECT_VERTICES 1024
 #define MAX_OBJECT_TRIANGLES 1024
-struct triangle_type
+typedef struct Poly_Type
 {
-	triangle3d *pv;//指向三角形顶点所在列表数据的指针
+	triangle3d_vertex *p_triangle_list;//指向object三角形顶点所在列表数据的指针
 	int vertex_index[3];//三个顶点的索引
-};
+}Poly,*Poly_Ptr;
 
 typedef struct Object_Type{
 	vector3 world_coord;//物体在世界坐标系的坐标
+	
+	int vertex_count;//顶点数
 	vertex3d vertex_data_local[MAX_OBJECT_VERTICES];//顶点，每个顶点坐标是相对于物体坐标
 	vertex3d vertex_data_transformed[MAX_OBJECT_VERTICES];
-	int vertex_count;//顶点数
+	
+
 	int triangle_count;//三角形数量
-	//triangle3d triangles[MAX_OBJECT_TRIANGLES];//三角形的数据
-	triangle_type triangle_list[MAX_OBJECT_TRIANGLES];//三角形列表
+	//triangle3d triangles[MAX_OsBJECT_TRIANGLES];//三角形的数据
+	Poly_Type triangle_list[MAX_OBJECT_TRIANGLES];//三角形列表数据
 }Object,*Ojbect_Ptr;
 
 //把物体坐标转换成世界坐标
