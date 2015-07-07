@@ -1,6 +1,7 @@
 #ifndef __TRIANGLE_H__
 #define __TRIANGLE_H__
 #include "vector.h"
+#include "vector.h"
 #include "comm_headers.h"
 
 //三角形顶点的定义，里面的v0等是3d坐标

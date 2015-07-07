@@ -54,51 +54,37 @@ int32_t Game_Main()
 {
 	 
 	StartClock();
-	quaternion q1;
-	quaternion q2;
-	float r1= PI;
-	float r2 = PI/2;
+	Matrix3 m(	1,2,3,
+				4,5,6,
+				7,8,9);
 
-	q1.t = cos(r1);
-	q1.x = sin(r1)*sqrt(1/9.0f);
-	q1.y = sin(r1)*sqrt(4/9.0f);
-	q1.z = sin(r1)*sqrt(4/9.0f);
+	Matrix3 inverse;
+	matrix3_inverse(m,&inverse);
+	matrix_dump(inverse);
 
-	q2.dump();
-	q2.t = cos(r2);
-	q2.dump();
-	q2.x = sin(r2)*sqrt(1/81.0f);
-	q2.dump();
-	q2.y = sin(r2)*sqrt(16/81.0f);
-	q2.dump();
-	q2.z = sin(r2)*sqrt(64/81.0f);
-	q2.dump();
+
+	Matrix4 m4(
+			1,0,0,100,
+			0,1,0,200,
+			0,0,1,300,
+			0,0,0,1);
+	Matrix4 m4_inverse;
+	matrix4_inverse(m4,&m4_inverse);
+	matrix_dump(m4_inverse);
+
+
+	vector3 v;
+	v.x = 1;
+	v.y = 2;
+	v.z = 3;
+
+	vector3 v_new = m4 * v;
+	vector_dump(v_new);
+
+	v_new = m4_inverse * v_new;
+
+	vector_dump(v_new);
 	
-	printf("%f	",sqrt(1/81.0f));
-	printf("%f	",sin(r2));
-	printf("%f	",sqrt(16/81.0f));
-	printf("%f	",sin(r2));
-	printf("%f	",sqrt(64/81.0f));
-	printf("%f	",sin(r2));
-
-
-	printf("%f,		\n",quaternion_get_norm(q1));
-	printf("%f,		\n",quaternion_get_norm(q2));
-
-	quaternion slerped_q=q1;
-	float inter_t = 0;
-	quaternion pre_slerped_q = q1;
-	for(inter_t=0;inter_t<1.0f;)
-	{
-		
-		slerped_q = quaternion_slerp(q1,q2,inter_t);
-		float diff_rad = acos(quaternion_dot_mul(slerped_q,pre_slerped_q));
-		printf("diff rad :  %f \n",diff_rad);
-		pre_slerped_q = slerped_q;
-		float acos_angle = acos(slerped_q.t);
-		printf("½Ç¶È%f,t:%f,x:%f,y:%f,z:%f\n",acos_angle,slerped_q.t,slerped_q.x,slerped_q.y,slerped_q.z);
-		inter_t+=0.01f;
-	}
 
 	unsigned long begin_tick = GetTickCount();
 	for ( int32_t i=0;i<10000;i++)

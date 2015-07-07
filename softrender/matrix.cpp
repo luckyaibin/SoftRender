@@ -1,9 +1,12 @@
 #include "matrix.h"
+#include "comm_headers.h"
 #include <stdio.h>
 
 Matrix3::Matrix3(const Matrix3 &m1)
 {
-
+	m00=m1.m00,m01=m1.m01,m02=m1.m02;
+	m10=m1.m10,m11=m1.m11,m12=m1.m12;
+	m20=m1.m20,m21=m1.m21,m22=m1.m22;
 }
 Matrix3& Matrix3::operator=(const Matrix3 &m1)
 {
@@ -65,6 +68,46 @@ Matrix3 operator*(float f,const Matrix3 &m1)
 	return m;
 }
 
+//vector3 operator*(Matrix3 m,vector3 v)
+//{
+//	float x = m.m00 * v.x + m.m01 * v.y + m.m02 * v.z;
+//	float y = m.m10 * v.x + m.m11 * v.y + m.m12 * v.z;
+//	float z = m.m20 * v.x + m.m21 * v.y + m.m22 * v.z;
+//	return vector3(x,y,z);
+//}
+
+float matrix3_det(Matrix3 m)
+{
+	//克莱姆法则
+	//float d = m.m00 * m.m11 *m.m22 + m.m01*m.m12*m.m20 + m.m02*m.m10*m.m21 - m.m02*m.m11*m.m20 - m.m01*m.m10*m.m22 - m.m00*m.m12*m.m21
+	//代数余子式
+	float d = m.m00*(m.m11*m.m22 - m.m21*m.m12) - m.m01*(m.m10*m.m22 - m.m20*m.m12) - m.m02*(m.m10*m.m21 - m.m20*m.m11);
+	return d;
+}
+
+int matrix3_inverse(Matrix3 m,Matrix3_Ptr inverse_res)
+{
+	float det = matrix3_det(m);
+	if (det<epsilon)
+	{
+		return 0;
+	}
+	float det_inv = 1.0/det;
+	 
+	inverse_res->m00 =  det_inv*(m.m11*m.m22 - m.m21*m.m12);
+	inverse_res->m10 = -det_inv*(m.m10*m.m22 - m.m20*m.m12);
+	inverse_res->m20 =  det_inv*(m.m10*m.m21 - m.m20*m.m11);
+
+	inverse_res->m01 = -det_inv*(m.m01*m.m22 - m.m21*m.m02);
+	inverse_res->m11 =  det_inv*(m.m00*m.m22 - m.m20*m.m02);
+	inverse_res->m21 = -det_inv*(m.m00*m.m21 - m.m20*m.m01);
+
+	inverse_res->m02 =  det_inv*(m.m01*m.m12 - m.m11*m.m02);
+	inverse_res->m12 = -det_inv*(m.m00*m.m12 - m.m10*m.m02);
+	inverse_res->m22 =  det_inv*(m.m00*m.m11 - m.m10*m.m01);
+	return 1;
+}
+
 const float& get_element_const_ref(const Matrix3& m,int row,int col)
 {
 	if (row==0 && col==0)
@@ -113,7 +156,10 @@ float& get_element_ref(Matrix3& m,int row,int col)
 
 Matrix4::Matrix4(const Matrix4 &m1)
 {
-
+	m00=m1.m00,m01=m1.m01,m02=m1.m02,m03=m1.m03;
+	m10=m1.m10,m11=m1.m11,m12=m1.m12,m13=m1.m13;
+	m20=m1.m20,m21=m1.m21,m22=m1.m22,m23=m1.m23;
+	m30=m1.m30,m31=m1.m31,m32=m1.m32,m33=m1.m33;
 }
 Matrix4& Matrix4::operator=(const Matrix4 &m1)
 {
@@ -179,6 +225,17 @@ Matrix4 operator*(const Matrix4& m1,float f)
 Matrix4 operator*(float f,const Matrix4 &m1)
 {
 	return m1*f;
+}
+//vector3 operator * (Matrix4 m,vector3 v)
+//{
+//	float x = m.m00 * v.x + m.m01 * v.y + m.m02 * v.z + m.m03;
+//	float y = m.m10 * v.x + m.m11 * v.y + m.m12 * v.z + m.m13;
+//	float z = m.m20 * v.x + m.m21 * v.y + m.m22 * v.z + m.m23;
+//	return vector3(x,y,z);
+//}
+float matrix4_det(Matrix4)
+{
+	return 0;
 }
 
 const float& get_element_const_ref(const Matrix4& m,int row,int col)
@@ -276,4 +333,35 @@ void matrix_dump(const Matrix4& m)
 		}
 		printf("\n");
 	}
+}
+
+int matrix4_inverse(Matrix4 m,Matrix4_Ptr inverse_res)
+{
+	float det = m.m00*(m.m11*m.m22 - m.m21*m.m12) - m.m01*(m.m10*m.m22 - m.m20*m.m12) - m.m02*(m.m10*m.m21 - m.m20*m.m11);
+	if (det<epsilon)
+	{
+		return 0;
+	}
+	float det_inv = 1.0/det;
+
+	inverse_res->m00 =  det_inv*(m.m11*m.m22 - m.m21*m.m12);
+	inverse_res->m01 = -det_inv*(m.m01*m.m22 - m.m21*m.m02);
+	inverse_res->m02 =  det_inv*(m.m01*m.m12 - m.m11*m.m02);
+	inverse_res->m03 = 0.0;
+
+	inverse_res->m10 = -det_inv*(m.m10*m.m22 - m.m20*m.m12);
+	inverse_res->m11 =  det_inv*(m.m00*m.m22 - m.m20*m.m02);
+	inverse_res->m12 = -det_inv*(m.m00*m.m12 - m.m10*m.m02);
+	inverse_res->m13 = 0.0;
+
+	inverse_res->m20 =  det_inv*(m.m10*m.m21 - m.m20*m.m11);
+	inverse_res->m21 = -det_inv*(m.m00*m.m21 - m.m20*m.m01);
+	inverse_res->m22 =  det_inv*(m.m00*m.m11 - m.m10*m.m01);
+	inverse_res->m23 = 0.0;
+
+	inverse_res->m30 = -( m.m30 * inverse_res->m00 + m.m31 * inverse_res->m10 + m.m32 * inverse_res->m20 );
+	inverse_res->m31 = -( m.m30 * inverse_res->m01 + m.m31 * inverse_res->m11 + m.m32 * inverse_res->m21 );
+	inverse_res->m32 = -( m.m30 * inverse_res->m02 + m.m31 * inverse_res->m12 + m.m32 * inverse_res->m22 );
+	inverse_res->m33 = 1.0;
+	return 1;
 }

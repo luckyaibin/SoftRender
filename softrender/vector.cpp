@@ -62,6 +62,15 @@ vector3 operator*(const Matrix3& m,const vector3& v)
 	return vector3(x,y,z);
 }
 
+// m:4*4 x v 3*1 (µ±≥…4x1æÿ’Û£©
+vector3 operator * (Matrix4 m,vector3 v)
+{
+	float x = m.m00 * v.x + m.m01 * v.y + m.m02 * v.z + m.m03;
+	float y = m.m10 * v.x + m.m11 * v.y + m.m12 * v.z + m.m13;
+	float z = m.m20 * v.x + m.m21 * v.y + m.m22 * v.z + m.m23;
+	return vector3(x,y,z);
+}
+
 float operator*(const vector3& v1,const vector3& v2)
 {
 	return 	v1.x * v2.x + v1.y * v2.y +	v1.z * v2.z ;

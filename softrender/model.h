@@ -3,9 +3,10 @@
 #include "triangle.h"
 #include "vector.h"
 #include "comm_headers.h"
+#include "camera.h"
 #include <fstream>
-#define MAX_OBJECT_VERTICES 1024;
-#define MAX_OBJECT_TRIANGLES 1024;
+#define MAX_OBJECT_VERTICES 1024
+#define MAX_OBJECT_TRIANGLES 1024
 struct triangle_type
 {
 	triangle3d *pv;//指向三角形顶点所在列表数据的指针

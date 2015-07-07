@@ -2,12 +2,19 @@
 #define __MATRIX_H
 #include <memory.h>
 #include "base_type.h"
+#include "vector.h"
 struct Matrix3;
+typedef Matrix3 *Matrix3_Ptr;
 struct Matrix4;
+typedef Matrix4 *Matrix4_Ptr;
 
 Matrix3 operator*(const Matrix3& m1,const Matrix3& m2);
 Matrix3 operator*(const Matrix3& m1,float f);
 Matrix3 operator*(float f,const Matrix3 &m1);
+//vector3 operator*(Matrix3 m,vector3 v);
+
+float matrix3_det(Matrix3);
+int matrix3_inverse(Matrix3 m,Matrix3_Ptr inverse_res);
 const float& get_element_const_ref(const Matrix3& m,int32_t row,int32_t col);
 float& get_element_ref(Matrix3& m,int32_t row,int32_t col);
 void matrix_dump(const Matrix3&);
@@ -15,12 +22,16 @@ void matrix_dump(const Matrix3&);
 Matrix4 operator*(const Matrix4& m1,const Matrix4& m2);
 Matrix4 operator*(const Matrix4& m1,float f);
 Matrix4 operator*(float f,const Matrix4 &m1);
+//vector3 operator*(Matrix4 m,vector3 v);
+
+float matrix4_det(Matrix4);
+int matrix4_inverse(Matrix4 m,Matrix4_Ptr inverse_res);
 
 const float& get_element_const_ref(const Matrix4& m,int32_t row,int32_t col);
 float& get_element_ref(Matrix4& m,int32_t row,int32_t col);
 void matrix_dump(const Matrix4&);
 
-struct Matrix3
+typedef struct Matrix3
 {
 	union{
 		float m[3][3];
@@ -54,11 +65,12 @@ struct Matrix3
 	friend Matrix3 operator*(const Matrix3& m1,const Matrix3& m2);
 	friend Matrix3 operator*(const Matrix3& m1,float f);
 	friend Matrix3 operator*(float f,const Matrix3 &m);
-
+	//friend vector3 operator*(Matrix3 m,vector3 v);
+	friend float matrix3_det(Matrix3);
 	friend void matrix_dump(const Matrix3&);
-};
+}Matrix3,*Matrix3_Ptr;
 
-struct Matrix4{
+typedef struct Matrix4{
 	union{
 		float m[4][4];
 		struct{
@@ -90,8 +102,11 @@ struct Matrix4{
 	friend Matrix4 operator*(const Matrix4& m1,const Matrix4& m2);
 	friend Matrix4 operator*(const Matrix4& m1,float f);
 	friend Matrix4 operator*(float f,const Matrix4 &m1);
+	friend vector3 operator * (Matrix4 m,vector3 v);
+
+	friend int matrix4_inverse(Matrix4 m,Matrix4_Ptr inverse_res);
 
 	friend void matrix_dump(const Matrix4&);
-};
+}Matrix4,*Matrix4_Ptr;
 
 #endif

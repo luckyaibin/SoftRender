@@ -4,13 +4,15 @@
 
 struct vector3;
 struct Matrix3;
+struct Matrix4;
 
 vector3 operator+(const vector3& v1,const vector3& v2);
 vector3 operator-(const vector3& v1,const vector3& v2);
 vector3 operator*(const vector3& v,float f);
 vector3 operator*(float f,const vector3& v);
-vector3 operator*(const vector3& v,const Matrix3& m);
+//vector3 operator*(const vector3& v,const Matrix3& m);
 vector3 operator*(const Matrix3& m,const vector3& v);
+vector3 operator * (Matrix4 m,vector3 v);
 float operator*(const vector3& v1,const vector3& v2);
 vector3 cross_mul(const vector3& a,const vector3& b);
 void vector_dump(const vector3&v);

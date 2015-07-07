@@ -19,7 +19,7 @@ int32_t main__()
 	}
 	v=1;
 
-	vector3 res1 = vec*m2;
+	vector3 res1 = m2*vec;
 	vector_dump(res1);
 
 	vector3 res2 = m2*vec;
