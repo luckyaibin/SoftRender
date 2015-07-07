@@ -65,8 +65,8 @@ int32_t Game_Main()
 
 	Matrix4 m4(
 			1,0,0,100,
-			0,1,0,200,
-			0,0,1,300,
+			4,1,0,200,
+			5,6,7,300,
 			0,0,0,1);
 	Matrix4 m4_inverse;
 	matrix4_inverse(m4,&m4_inverse);

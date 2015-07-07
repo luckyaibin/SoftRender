@@ -29,9 +29,12 @@ Matrix3 get_matrix_from_x_y_z_axis_angle(float x_axis_angle,float y_axis_angle,f
 	return x_axis*y_axis*z_axis;
 }
 
-//围绕任意单位长度的向量v旋转一定角度,a,b,c是向量v在x，y，z上的分量
-Matrix3 get_matrix_from_any_axis_angle(float a,float b,float c,float angle)
+//围绕任意向量v旋转一定角度,a,b,c是向量v在x，y，z上的分量
+Matrix3 get_matrix_from_any_axis_angle(vector3 v,float angle)
 {
+	float a = v.x;
+	float b = v.y;
+	float c = v.z;
 	float K = 1 - cos(angle);
 	float sin_angle = sin(angle);
 	float cos_angle = cos(angle);
@@ -43,5 +46,31 @@ Matrix3 get_matrix_from_any_axis_angle(float a,float b,float c,float angle)
 	);
 	return m;
 }
+
+//分别沿着x，y，z缩放
+Matrix3 get_matrix_from_scale_x_y_z(float scale_x,float scale_y,float scale_z)
+{
+	Matrix3 m(scale_x,	0,			0,
+			  0,		scale_y,	0,
+			  0,		0,			scale_z);
+	return m;
+}
+
+//沿着任意向量v的方向缩放 k 倍
+
+Matrix3 get_matrix_from_vectror(vector3 v,float k)
+{
+	float x = v.x;
+	float y = v.y;
+	float z = v.z;
+	Matrix3 m(
+			1 + (k-1)*x*x,	(k-1)*x*y,	(k-1)*x*z,
+			(k-1)*x*y,		1+(k-1)*y*y,(k-1)*y*z,
+			(k-1)*x*z,	(k-1)*y*z,		1+(k-1)*z*z
+		);
+	return m;
+}
+
+
 
 #endif

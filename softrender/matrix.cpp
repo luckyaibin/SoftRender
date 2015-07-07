@@ -317,6 +317,7 @@ void matrix_dump(const Matrix3& m)
 		for (int j=0;j<3;j++)
 		{
 			printf("%f	",get_element_const_ref(m,i,j));
+			//printf("m%d%d,",i,j);
 		}
 		printf("\n");
 	}
@@ -330,6 +331,7 @@ void matrix_dump(const Matrix4& m)
 		for (int j=0;j<4;j++)
 		{
 			printf("%f	",get_element_const_ref(m,i,j));
+			//printf("m%d%d,",i,j);
 		}
 		printf("\n");
 	}
@@ -337,6 +339,16 @@ void matrix_dump(const Matrix4& m)
 
 int matrix4_inverse(Matrix4 m,Matrix4_Ptr inverse_res)
 {
+	/*
+		a b c d
+		e f g h
+		i j k l
+		0 0 0 1
+		对于一般的4x4矩阵来说，最下面一行肯定是0 0 0 1，所以它的determinate 和 3x3的一样：
+		-0 *| b c d |+ 0 * ... - 0 * ... + 1 * | a b c |
+		    | f g h	|						   | e f g |
+			| j k l |                          | i j k |
+	*/
 	float det = m.m00*(m.m11*m.m22 - m.m21*m.m12) - m.m01*(m.m10*m.m22 - m.m20*m.m12) - m.m02*(m.m10*m.m21 - m.m20*m.m11);
 	if (det<epsilon)
 	{
@@ -344,24 +356,27 @@ int matrix4_inverse(Matrix4 m,Matrix4_Ptr inverse_res)
 	}
 	float det_inv = 1.0/det;
 
+
+
 	inverse_res->m00 =  det_inv*(m.m11*m.m22 - m.m21*m.m12);
-	inverse_res->m01 = -det_inv*(m.m01*m.m22 - m.m21*m.m02);
-	inverse_res->m02 =  det_inv*(m.m01*m.m12 - m.m11*m.m02);
-	inverse_res->m03 = 0.0;
+	inverse_res->m01 = -det_inv*(m.m01*m.m22 - m.m02*m.m21);
+	inverse_res->m02 =  det_inv*(m.m01*m.m12 - m.m02*m.m11);
+	inverse_res->m03 = det_inv*(-m.m02*m.m13 - m.m03*m.m12 + m.m22*(m.m01*m.m13 - m.m03*m.m11)-m.m23*(m.m01*m.m12 - m.m02*m.m11 ));
 
-	inverse_res->m10 = -det_inv*(m.m10*m.m22 - m.m20*m.m12);
-	inverse_res->m11 =  det_inv*(m.m00*m.m22 - m.m20*m.m02);
-	inverse_res->m12 = -det_inv*(m.m00*m.m12 - m.m10*m.m02);
-	inverse_res->m13 = 0.0;
+	inverse_res->m10 = -det_inv*(m.m10*m.m22 - m.m12*m.m20);
+	inverse_res->m11 =  det_inv*(m.m00*m.m22 - m.m02*m.m20);
+	inverse_res->m12 = -det_inv*(m.m00*m.m12 - m.m02*m.m10);
+	inverse_res->m13 = det_inv*(m.m20*(m.m02*m.m13 - m.m03*m.m12)-m.m22*(m.m00*m.m13 - m.m03*m.m10)+m.m23*(m.m00*m.m12 - m.m02*m.m10));
 
-	inverse_res->m20 =  det_inv*(m.m10*m.m21 - m.m20*m.m11);
-	inverse_res->m21 = -det_inv*(m.m00*m.m21 - m.m20*m.m01);
-	inverse_res->m22 =  det_inv*(m.m00*m.m11 - m.m10*m.m01);
-	inverse_res->m23 = 0.0;
+	inverse_res->m20 =  det_inv*(m.m10*m.m21 - m.m11*m.m20);
+	inverse_res->m21 = -det_inv*(m.m00*m.m21 - m.m01*m.m20);
+	inverse_res->m22 =  det_inv*(m.m00*m.m11 - m.m01*m.m10);
+	inverse_res->m23 = det_inv*(-m.m20*(m.m01*m.m13-m.m03*m.m11) + m.m21*(m.m00*m.m13 - m.m03*m.m10) - m.m23*(m.m00*m.m11-m.m01*m.m10));
 
-	inverse_res->m30 = -( m.m30 * inverse_res->m00 + m.m31 * inverse_res->m10 + m.m32 * inverse_res->m20 );
-	inverse_res->m31 = -( m.m30 * inverse_res->m01 + m.m31 * inverse_res->m11 + m.m32 * inverse_res->m21 );
-	inverse_res->m32 = -( m.m30 * inverse_res->m02 + m.m31 * inverse_res->m12 + m.m32 * inverse_res->m22 );
+
+	inverse_res->m30 = 0.0;
+	inverse_res->m31 = 0.0;
+	inverse_res->m32 = 0.0;
 	inverse_res->m33 = 1.0;
 	return 1;
 }
