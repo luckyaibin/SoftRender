@@ -321,6 +321,7 @@ void matrix_dump(const Matrix3& m)
 		}
 		printf("\n");
 	}
+	printf("\n");
 }
 
 

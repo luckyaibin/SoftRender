@@ -97,6 +97,14 @@ typedef struct Matrix4{
 		m20=m21=m22=m23=0.0f;
 		m30=m31=m32=m33=0.0f;
 	}
+	Matrix4(const Matrix3 &m3x3)
+	{
+		//m00 = m11 = m22 = m33 = 1.0f;
+		m00= m3x3.m00;	m01= m3x3.m01;	m02 = m3x3.m02;	m03=0.0f;
+		m10= m3x3.m10;	m11= m3x3.m11;	m12 = m3x3.m12;	m13=0.0f;
+		m20= m3x3.m20;	m21= m3x3.m21;	m22 = m3x3.m22;	m23=0.0f;
+		m30= 0.0f;		m31= 0.0f;		m32 = 0.0f;		m33=1.0f;
+	}
 	Matrix4(const Matrix4 &m1);
 	Matrix4& operator=(const Matrix4 &m1);
 	friend Matrix4 operator*(const Matrix4& m1,const Matrix4& m2);

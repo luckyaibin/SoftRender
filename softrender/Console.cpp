@@ -41,103 +41,55 @@ void WaitClock()
 		Sleep(5);
 	}
 }
-
+Object g_obj;
+Camera g_camera;
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
 	AllocConsole();
 	freopen( "CONOUT$","w",stdout);
+
+	ObjectInit(&g_obj);
+	g_camera.word_pos = vector3(0,0,5);
 	return 1;
 }
 int32_t g_drawed = 0;
+
+
+float g_angle_y = 0;
+float g_angle_x = 0;
+
+ 
+
 int32_t Game_Main()
 {
 	 
 	StartClock();
-
-	Object obj;
-	obj.vertex_count = 4;
-	//obj.triangle_list[0] = 
-	vertex3d *v = new vertex3d();
-	v->x = 0;
-	v->y = 1;
-	v->z = 0;
-	v->color = RGB(255,0,0);
-	obj.vertex_data_local[0] = *v;
-
-	v = new vertex3d();
-	v->x = -1;
-	v->y = -1;
-	v->z = 0;
-	v->color = RGB(0,255,0);
-	obj.vertex_data_local[1] = *v;
-
-	v = new vertex3d();
-	v->x = 1;
-	v->y = -1;
-	v->z = 0;
-	v->color = RGB(0,0,255);
-	obj.vertex_data_local[2] = *v;
-
-	v = new vertex3d();
-	v->x = 0;
-	v->y = 0;
-	v->z = 2;
-	v->color = RGB(0,0,100);
-	obj.vertex_data_local[3] = *v;
-
-
-	Matrix3 m(	1,2,3,
-				4,5,6,
-				7,8,9);
-
-	Matrix3 inverse;
-	matrix3_inverse(m,&inverse);
-	matrix_dump(inverse);
-
-
-	Matrix4 m4(
-			1,0,0,100,
-			4,1,0,200,
-			5,6,7,300,
-			0,0,0,1);
-	Matrix4 m4_inverse;
-	matrix4_inverse(m4,&m4_inverse);
-	matrix_dump(m4_inverse);
-
-
-	vector3 v;
-	v.x = 1;
-	v.y = 2;
-	v.z = 3;
-
-	vector3 v_new = m4 * v;
-	vector_dump(v_new);
-
-	v_new = m4_inverse * v_new;
-
-	vector_dump(v_new);
+	FillSurface(ARGB(0,0,0,0));
 	
+	//g_angle_y += 0.005f;
+	g_angle_y = mod_pi(g_angle_y);
 
-	unsigned long begin_tick = GetTickCount();
-	for ( int32_t i=0;i<10000;i++)
-	{
-		mod_pi(HALF_PI);
-	}
-	unsigned long end_tick = GetTickCount();
+	g_angle_x += 0.003f;
+	g_angle_x = mod_pi(g_angle_x);
 
-	printf("mod_pi time consumed .. %d %f\n",end_tick - begin_tick,mod_pi(HALF_PI));
-	begin_tick = GetTickCount();
-	for ( int32_t i=0;i<10000;i++)
-	{
-		fmod(HALF_PI,PI);
-	}
-	end_tick = GetTickCount();
+	printf("g_angle_x %f \n",g_angle_x / PI * 360);
+	printf("g_angle_y %f \n",g_angle_y / PI * 360);
 
-	printf("fmod time consumed .. %d %f\n",end_tick - begin_tick,fmod(HALF_PI,PI));
+	Matrix3 m_rotate3x3 = get_matrix_from_x_y_z_axis_angle(g_angle_x,g_angle_y,0);
+	Matrix4 m_rotate4x4 = m_rotate3x3;
+	ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL);
+
+	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
+	ObjectCameraTransform(&g_obj,&g_camera);
+	ObjectProjectTransform(&g_obj);
+
+
+	ObjectDraw(&g_obj,200,100);
+
  
 	//DrawTriangleWithEdgeEquation
-	for(int32_t i=0;i<1000;i++)
+	for(int32_t i=0;i<-1000;i++)
 	{
 		vertex2d v1,v2,v3;
 		 int32_t a = rand()%255;

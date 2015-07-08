@@ -23,6 +23,8 @@ bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height);
 void FlipSurface();
 void Release3DLib();
 
+int FillSurface(ARGB color);
+
 bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height);
 
 int32_t DrawPixel(int32_t x,int32_t y, ARGB color);

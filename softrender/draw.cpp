@@ -317,3 +317,9 @@ static inline void test()
 
 }
 
+int FillSurface(ARGB color)
+{
+	pDevice->ColorFill(pSurface, NULL, color);
+	return 1;
+}
+
