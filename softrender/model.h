@@ -146,6 +146,33 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 		v22.x *= screen_w;
 		v22.y *= screen_h;
 
+		/*if (v00.x<0)
+			v00.x = 0;
+		if (v00.x>screen_w)
+			v00.x=screen_w;
+		if (v00.y<0)
+			v00.y=0;
+		if (v00.y>screen_h)
+			v00.y=screen_h;
+
+		if (v11.x<0)
+			v11.x = 0;
+		if (v11.x>screen_w)
+			v11.x=screen_w;
+		if (v11.y<0)
+			v11.y=0;
+		if (v11.y>screen_h)
+			v11.y=screen_h;
+
+		if (v22.x<0)
+			v22.x = 0;
+		if (v22.x>screen_w)
+			v22.x=screen_w;
+		if (v22.y<0)
+			v22.y=0;
+		if (v22.y>screen_h)
+			v22.y=screen_h;*/
+
 		DrawTriangleWithEdgeEquation(v00,v11,v22,0);
 	}
 }
@@ -185,6 +212,8 @@ void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
 			p_obj->vertex_data_transformed[i].x = vr.x;
 			p_obj->vertex_data_transformed[i].y = vr.y;
 			p_obj->vertex_data_transformed[i].z = vr.z;
+			p_obj->vertex_data_transformed[i].color = vx.color;
+
 		}
 		break;
 	default:break;
@@ -238,15 +267,17 @@ void ObjectCameraTransform(Ojbect_Ptr p_ojb,Camera_Ptr camera)
 	for (int i=0;i<p_ojb->vertex_count;i++)
 	{
 		vertex3d v =  p_ojb->vertex_data_transformed[i];
-		v.x -= camera->word_pos.x;
-		v.y -= camera->word_pos.y;
-		v.z -= camera->word_pos.z;
+		v.x -= camera->world_pos.x;
+		v.y -= camera->world_pos.y;
+		v.z -= camera->world_pos.z;
 
 		vector3 vv(v.x,v.y,v.z);
 		vv = camera_rotate_matrix*vv;
 		v.x = vv.x;
 		v.y = vv.y;
 		v.z = vv.z;
+
+		
 
 		p_ojb->vertex_data_transformed[i] = v;
 	}

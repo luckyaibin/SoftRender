@@ -17,7 +17,7 @@ float operator*(const vector3& v1,const vector3& v2);
 vector3 cross_mul(const vector3& a,const vector3& b);
 void vector_dump(const vector3&v);
 
-struct vector3{
+typedef struct vector3{
 	float x,y,z;
 	vector3()
 	{
@@ -28,7 +28,7 @@ struct vector3{
 		this->x =x,this->y=y,this->z=z;
 	}
 	friend void vector_dump(const vector3&v);
-};
+}vector3,*vector3_ptr;
 
 struct vector4;
 struct Matrix4;

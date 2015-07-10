@@ -50,7 +50,7 @@ int32_t Game_Init()
 	freopen( "CONOUT$","w",stdout);
 
 	ObjectInit(&g_obj);
-	g_camera.word_pos = vector3(0,0,5);
+	g_camera.world_pos = vector3(0,0,5);
 	return 1;
 }
 int32_t g_drawed = 0;
@@ -67,20 +67,34 @@ int32_t Game_Main()
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
 	
-	//g_angle_y += 0.005f;
+	g_angle_y += 0.01f;
+	if (g_angle_y>2*PI)
+	{
+		g_angle_y = 0.0;
+	}
 	g_angle_y = mod_pi(g_angle_y);
 
-	g_angle_x += 0.003f;
-	g_angle_x = mod_pi(g_angle_x);
-
-	printf("g_angle_x %f \n",g_angle_x / PI * 360);
-	printf("g_angle_y %f \n",g_angle_y / PI * 360);
+	//g_angle_x += 0.003f;
+	//g_angle_x = mod_pi(g_angle_x);
+	if (g_angle_x>2*PI)
+	{
+		g_angle_x -= 2*PI;
+	}
+	//printf("g_angle_x %f \n",g_angle_x / PI * 360);
+	//printf("g_angle_y %f \n",g_angle_y / PI * 360);
 
 	Matrix3 m_rotate3x3 = get_matrix_from_x_y_z_axis_angle(g_angle_x,g_angle_y,0);
 	Matrix4 m_rotate4x4 = m_rotate3x3;
-	ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL);
+	/*m_rotate4x4 = Matrix4(1,0,0,0,
+	0,1,0,0,
+	0,0,1,0,
+	0,0,0,1);*/
+	ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL_TO_TRANS);
 
-	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
+	ObjectWorldTransform(&g_obj,TT_TRANS);
+	//g_camera.word_pos.x +=0.1f;
+	//if (g_camera.word_pos.x>5)
+	//	g_camera.word_pos.x =0;
 	ObjectCameraTransform(&g_obj,&g_camera);
 	ObjectProjectTransform(&g_obj);
 
