@@ -1,3 +1,6 @@
+#ifndef __MODEL_H__
+#define __MODEL_H__
+
 #include "matrix.h"
 #include "tool.h"
 #include "triangle.h"
@@ -295,4 +298,4 @@ void ObjectProjectTransform(Ojbect_Ptr p_obj)
 }
 
 
-
+#endif

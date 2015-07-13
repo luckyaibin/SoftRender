@@ -145,7 +145,7 @@ void InitUVNCamera(
 
 void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 {
-	Matrix4 m(	1,0,0,-p_uvn_camera->world_pos.x,
+	Matrix4 m_move(	1,0,0,-p_uvn_camera->world_pos.x,
 				0,1,0,-p_uvn_camera->world_pos.y,
 				0,0,1,-p_uvn_camera->world_pos.z,
 				1,0,0,1);
@@ -157,24 +157,41 @@ void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 			p_uvn_camera->euler_cam_direction.y,
 			p_uvn_camera->euler_cam_direction.z);
 
-		p_uvn_camera->matrix_camera = mEuler * m;
+		p_uvn_camera->matrix_camera =mEuler * m_move;
 	}
 	else if(p_uvn_camera->camera_type == CT_UVN)
 	{
 		//根据欧拉角的值来计算目标点
 		if (p_uvn_camera->is_target_need_compute)
 		{
-			float rotate_x = p_uvn_camera->euler_cam_direction.x;//绕x轴旋转的角度
-			float rotate_y = p_uvn_camera->euler_cam_direction.y;//绕y轴旋转的角度
-			float rotate_z = p_uvn_camera->euler_cam_direction.z;//绕z轴旋转的角度
-
-			
-			float x =cos(rotate_z);
-			float y =sin(rotate_z);
-
-
+			Matrix3 mEuler = get_matrix_from_x_y_z_axis_angle(p_uvn_camera->euler_cam_direction.x,
+				p_uvn_camera->euler_cam_direction.y,
+				p_uvn_camera->euler_cam_direction.z);
+			vector3 v(0,0,-1);
+			v =mEuler * v;
+			p_uvn_camera->uvn_target_pos.x = v.x;
+			p_uvn_camera->uvn_target_pos.y = v.y;
+			p_uvn_camera->uvn_target_pos.z = v.z;
 
 		}
+
+		vector3 u,v,n;
+		n = p_uvn_camera->uvn_target_pos - p_uvn_camera->world_pos;
+		v = p_uvn_camera->v;
+		u = cross_mul(n,v);
+
+		v = cross_mul(u,n);
+
+		normalize(&u);
+		normalize(&v);
+		normalize(&n);
+
+		Matrix4 m4(
+			p_uvn_camera->u.x,	p_uvn_camera->v.x,	p_uvn_camera->n.x,	0,
+			p_uvn_camera->u.y,	p_uvn_camera->v.y,	p_uvn_camera->n.y,	0,
+			p_uvn_camera->u.z,	p_uvn_camera->v.z,	p_uvn_camera->n.z,	0,
+			0,					0,					0,					1);
+		p_uvn_camera->matrix_camera = m4*m_move;
 	}
 }
 #endif

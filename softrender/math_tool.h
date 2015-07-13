@@ -2,6 +2,7 @@
 #define __MATH_TOOL_H__
 #include "base_type.h"
 #include <float.h>
+#include <stdio.h>
 //指数全为1，尾数全为0表示无穷，正、负无穷看符号位决定
 #define IS_FLOAT_INFINITE(f) ( (((FLOAT_FORMAT*)(&f))->exponent == 0xFF) && (((FLOAT_FORMAT*)(&f))->mantissa == 0) )
 
@@ -21,7 +22,7 @@
 
 #define ABS(x) (x>0)?(x):(-x)
 
-uint32_t dump_float(float f)
+inline uint32_t dump_float(float f)
 {
 	FLOAT_UINT32_UNION *fu = (FLOAT_UINT32_UNION*)&f;
 	for (int i=0;i<32;i++)
@@ -37,7 +38,7 @@ uint32_t dump_float(float f)
 	return fu->ui;
 }
 
-float float_from_bit_array(uint32_t bit_arr[],uint32_t size)
+inline float float_from_bit_array(uint32_t bit_arr[],uint32_t size)
 {
 	float res_float = 0.0f;
 	FLOAT_UINT32_UNION *fu = (FLOAT_UINT32_UNION*)&res_float;
@@ -62,7 +63,7 @@ Float value	原始的Hexadecimal	负数则用0x80000000减去原始Hexadecimal				Decimal
 -4.20E-45		0x80000003				0xFFFFFFFD										-3
 */
 //转换为整数进行比较，如果有浮点数数为负数，转为对应的负正数表示，在相减
-int32_t is_float_equal(float f1,float f2,int32_t maxUlps)
+inline int32_t is_float_equal(float f1,float f2,int32_t maxUlps)
 {
 	if (f1==f2)
 	{
@@ -87,7 +88,7 @@ int32_t is_float_equal(float f1,float f2,int32_t maxUlps)
 	return 0;
 }
 
-uint32_t float_diff_to_ULP(float diff)
+inline uint32_t float_diff_to_ULP(float diff)
 {
 	FLOAT_UINT32_UNION fuu;
 	fuu.f = diff;
@@ -113,7 +114,7 @@ union Float_t
 #endif
 };
 
-void IterateAllPositiveFloats(float start_float)
+inline void IterateAllPositiveFloats(float start_float)
 {
 	// Start at zero and print that float.
 	Float_t allFloats;
@@ -132,7 +133,7 @@ void IterateAllPositiveFloats(float start_float)
 		dump_float(allFloats.f);
 	}
 }
-int32_t get_msb0(uint32_t n)
+inline int32_t get_msb0(uint32_t n)
 {
 	int32_t highest_bit_pos = 31;
 	if (0==n)
@@ -144,7 +145,7 @@ int32_t get_msb0(uint32_t n)
 	return highest_bit_pos;
 }
 //get most significant bit,获取最高位为1的bit索引
-int32_t get_msb1(uint32_t n)
+inline int32_t get_msb1(uint32_t n)
 {
 	int32_t lvl=4;
 	int32_t msb=0;
@@ -166,7 +167,7 @@ int32_t get_msb1(uint32_t n)
 	//printf("msb is %d\n",msb);
 	return msb;
 }
-int32_t get_msb2(uint32_t n)
+inline int32_t get_msb2(uint32_t n)
 {
 	int32_t lvl=4;
 	int32_t msb=0;
@@ -186,7 +187,7 @@ int32_t get_msb2(uint32_t n)
 	return msb;
 }
 
-int32_t get_msb_noloop(uint32_t n)
+inline int32_t get_msb_noloop(uint32_t n)
 {
 	int32_t msb=0;
 	///////////////////////lvl=4
@@ -248,7 +249,7 @@ int32_t get_msb_noloop(uint32_t n)
 
 
 
-int32_t get_msb_noloop0(uint32_t n)
+inline int32_t get_msb_noloop0(uint32_t n)
 {
 	int32_t msb=0;
 	int32_t m;
@@ -290,7 +291,7 @@ int32_t get_msb_noloop0(uint32_t n)
 
 
 //把浮点数转换成定点数，不通过*(1<<fracbits)的方式，只通过移位操作。fracbits是定点数偏移
-int32_t float_to_fixpoint(float fval,int32_t fracbits)
+inline int32_t float_to_fixpoint(float fval,int32_t fracbits)
 {
 	int32_t ival = *(int32_t *)&fval;
 	// 提取尾数,注意实际的尾数前面还有一个被省略掉的1
@@ -309,7 +310,7 @@ int32_t float_to_fixpoint(float fval,int32_t fracbits)
 	return mantissa;
 }
 //把定点数转换成浮点数
-float fixpoint_to_float(int32_t i,int32_t fractbits)
+inline float fixpoint_to_float(int32_t i,int32_t fractbits)
 {
 	float f;
 	int32_t *p = (int32_t*)&f;

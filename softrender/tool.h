@@ -2,6 +2,7 @@
 #define __TOOL_H__
 #include "base_type.h"
 #include "math_tool.h"
+#include "comm_headers.h"
 #include <math.h>
 
 /*
@@ -41,7 +42,7 @@ Yn+1 = sin(θn-1 + θn) * Xn-1 + cos(θn-1 + θn) * Yn-1
 所以最后的X，Y的值其实等于连续旋转的所有角度加起来的cos和sin值乘以最初的x，y的值
 只可意会，感觉说不明白了。。
 */
-float atan_rad_table[21] = {
+static float atan_rad_table[21] = {
 	0.78539816339745f,
 	0.46364760900081f,
 	0.24497866312686f,
@@ -69,7 +70,7 @@ float atan_rad_table[21] = {
 	9.5367431640596e-007f,
 };
 
-float k_accu_table[21] = {
+static float k_accu_table[21] = {
 	0.70710678118655f,
 	0.63245553203368f,
 	0.6135719910779f,
@@ -93,7 +94,7 @@ float k_accu_table[21] = {
 	0.60725293500897f
 };
 // 1/(2^0) ,1/(2^1) ... 1/(2^n)
-float inverse_two_power[21] ={
+static float inverse_two_power[21] ={
 	1.0f,	 
 	0.5f,	 
 	0.25f,	 
@@ -116,7 +117,7 @@ float inverse_two_power[21] ={
 	1.9073486328125e-006f,
 	9.5367431640625e-007f,
 };
-float cos_table[] = 
+static float cos_table[] = 
 {
 	0.70710678118655,
 	0.89442719099992,
@@ -141,7 +142,7 @@ float cos_table[] =
 	0.99999999999955,
 };
 //最后需要矫正来得到正确的浮点数x和y值(rad是0 ~ PI/2)
-float __todo_fast_tan(float rad)
+inline float __todo_fast_tan(float rad)
 {
 	float z = 0;
 	float curr_x = 1;
@@ -171,7 +172,7 @@ float __todo_fast_tan(float rad)
 }
 
 //最后不需要矫正的浮点数xy的值，因为初始化的时候x已经被乘以了最后的矫正值
-float fast_sin_cordic(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
+inline float fast_sin_cordic(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan=NULL)
 {
 	//正弦余弦的符号
 	int32_t sin_sign = 1;
@@ -233,7 +234,7 @@ float fast_sin_cordic(float rad,float *p_sin=NULL,float *p_cos=NULL,float *p_tan
 }
 
 //定点数版本的CORDIC算法float_rad属于 :0~PI/2
-float fast_sin_cos_fix_point_18(float float_rad)
+inline float fast_sin_cos_fix_point_18(float float_rad)
 {
 	//这些都是浮点数左移了18bit之后的定点数
 	int32_t k_accu_table[21] = {
@@ -329,14 +330,14 @@ float fast_sin_cos_fix_point_18(float float_rad)
 }
 
 //角度x: 0 ~ PI
-float fast_sin_parabola__(float x)
+inline float fast_sin_parabola__(float x)
 {
 	float y = x*(const_fast_sin_4_d_pi - const_fast_sin_4_d_pi2*x);
 	y = y*(const_fast_sin_Q + const_fast_sin_P*y);
 	return y;
 }
 
-float fast_sin()
+inline float fast_sin()
 {
 	return 0;
 }
@@ -354,7 +355,7 @@ inline double isqrt_approx_in_neighborhood(double s, double neighborhood, double
 	return scale / sqrt(neighborhood) + scale * (s - neighborhood) * (-0.5 * 1.0 / (neighborhood * sqrt(neighborhood)));
 }
 
-double fast_normalize(double s, double neighborhood, double scale) {
+inline double fast_normalize(double s, double neighborhood, double scale) {
 	double factor = 1;
 	const double LIMIT = 0.9995;
 	const double limit2 = LIMIT * LIMIT;

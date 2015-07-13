@@ -89,6 +89,7 @@
     <ClInclude Include="math_tool.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="plane.h" />
     <ClInclude Include="quaternion.h" />
     <ClInclude Include="tool.h" />
     <ClInclude Include="triangle.h" />

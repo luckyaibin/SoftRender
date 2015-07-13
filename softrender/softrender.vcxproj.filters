@@ -57,6 +57,9 @@
     <ClInclude Include="euler_rotate.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="plane.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp">

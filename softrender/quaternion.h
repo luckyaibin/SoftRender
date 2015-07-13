@@ -1,5 +1,6 @@
 ﻿#include <math.h>
 #include "matrix.h"
+#include "tool.h"
 struct complex_number
 {
 	float r;

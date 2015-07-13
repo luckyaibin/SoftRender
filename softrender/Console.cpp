@@ -2,7 +2,7 @@
 #include "vector.h"
 #include <Windows.h>
 #include <iostream>
-#include "tool.h"
+//#include "tool.h"
 #include "quaternion.h"
 #include "euler_rotate.h"
 #include "model.h"

@@ -1,7 +1,7 @@
 #pragma  once
 #include "vector.h"
 #include "matrix.h"
-
+#include "tool.h"
 #include <stdio.h>
 vector3 operator+(const vector3& v1,const vector3& v2)
 {
@@ -82,6 +82,14 @@ vector3 cross_mul(const vector3& a,const vector3& b)
 	v.y = a.z * b.x - a.x * b.z;
 	v.z = a.x * b.y - a.y * b.x;
 	return v;
+}
+
+void normalize(vector3 * v)
+{
+	float invert_sqrt_length = InvSqrt(v->x *v->x + v->y * v->y + v->z * v->z);
+	v->x *= invert_sqrt_length;
+	v->y *= invert_sqrt_length;
+	v->z *= invert_sqrt_length;
 }
 
 void vector_dump(const vector3&v)
