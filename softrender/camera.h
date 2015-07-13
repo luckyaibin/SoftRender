@@ -159,7 +159,7 @@ void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 	Matrix4 m_move(	1,0,0,-p_uvn_camera->world_pos.x,
 				0,1,0,-p_uvn_camera->world_pos.y,
 				0,0,1,-p_uvn_camera->world_pos.z,
-				1,0,0,1);
+				0,0,0,1);
 
 	//当时euler相机是，相机里的Direction
 	if (p_uvn_camera->camera_type == CT_EULER)//欧拉相机
@@ -192,11 +192,15 @@ void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 		u = cross_mul(n,v);
 
 		v = cross_mul(u,n);
-
+		vector_dump(u);
+		vector_dump(v);
+		vector_dump(n);
 		normalize(&u);
 		normalize(&v);
 		normalize(&n);
-
+		p_uvn_camera->u=u;
+		p_uvn_camera->v=v;
+		p_uvn_camera->n=n;
 		Matrix4 m4(
 			p_uvn_camera->u.x,	p_uvn_camera->v.x,	p_uvn_camera->n.x,	0,
 			p_uvn_camera->u.y,	p_uvn_camera->v.y,	p_uvn_camera->n.y,	0,

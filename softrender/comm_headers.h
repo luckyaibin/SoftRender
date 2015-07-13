@@ -1,6 +1,15 @@
 #ifndef __COMM_HEADERS_H__
 #define __COMM_HEADERS_H__
 #include "base_type.h"
+#define ARGB_MASK 0xff
+
+#define ARGB(a, r, g, b) ((b&ARGB_MASK) + ((g&ARGB_MASK) << 8) + ((r&ARGB_MASK) << 16) + ((a&ARGB_MASK) << 24))
+
+#define GET_ARGB_A(argb) ( (argb>>24) & ARGB_MASK)
+#define GET_ARGB_R(argb) ( (argb>>16) & ARGB_MASK)
+#define GET_ARGB_G(argb) ( (argb>>8) & ARGB_MASK)
+#define GET_ARGB_B(argb) ( (argb>>0) & ARGB_MASK)
+
 #ifndef MACRO_SWAP
 	#define MACRO_SWAP(a,b,type) do{type c = (a);a=(b);b=c;}while(0)
 

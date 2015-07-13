@@ -56,9 +56,9 @@ int32_t Game_Init()
 	vector3 init_v(0,1,0);
 	InitUVNCamera(&g_camera,
 		CT_UVN,
-		vector3(0,0,5),
+		vector3(0,0,3),
 		NULL,
-		&g_camera_target_pos,
+		&g_obj.world_coord,
 		&init_v,
 		0,
 		-1,
@@ -107,8 +107,10 @@ int32_t Game_Main()
 	0,0,1,0,
 	0,0,0,1);*/
 	//ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL_TO_TRANS);
+	g_camera.world_pos.x += 0.01;
+	g_camera.world_pos.x = fmod(g_camera.world_pos.x,4);
 	CameraUpdateMatrix(&g_camera);
-	ObjectWorldTransform(&g_obj,TT_TRANS);
+	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
 	//g_camera.word_pos.x +=0.1f;
 	//if (g_camera.word_pos.x>5)
 	//	g_camera.word_pos.x =0;

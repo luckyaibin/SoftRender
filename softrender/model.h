@@ -250,7 +250,9 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 			v.x += p_obj->world_coord.x;
 			v.y += p_obj->world_coord.y;
 			v.z += p_obj->world_coord.z;
+			vertex3d_dump(v);
 			p_obj->vertex_data_transformed[i] = v;
+			
 		}
 		break;
 	default:break;
@@ -287,9 +289,10 @@ void ObjectCameraTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 		v.x = p_obj->vertex_data_transformed[i].x;
 		v.y = p_obj->vertex_data_transformed[i].y;
 		v.z = p_obj->vertex_data_transformed[i].z;
-
+		vector_dump(v);
 		//执行相机变换
 		v = p_camera->matrix_camera * v;
+		vector_dump(v);
 		//
 		p_obj->vertex_data_transformed[i].x = v.x/v.z;
 		p_obj->vertex_data_transformed[i].y = v.y/v.z;

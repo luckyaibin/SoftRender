@@ -96,4 +96,9 @@ int32_t evaluate_edge(struct edge_eqn * edge,int32_t x,int32_t y);
 
 void DrawTriangleWithEdgeEquation(vertex2d v0,vertex2d v1,vertex2d v2,ARGB color);
 ARGB interpolate_color_triangle(int32_t x,int32_t y,vertex2d v0,vertex2d v1,vertex2d v2);
+
+inline void vertex3d_dump(const vertex3d& v)
+{
+	printf("x:%f,y:%f,z:%f	r:%d,g:%d,b:%d \n",v.x,v.y,v.z,GET_ARGB_R(v.color),GET_ARGB_G(v.color),GET_ARGB_B(v.color));
+}
 #endif
