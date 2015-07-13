@@ -114,10 +114,6 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 		vertex3d v1 = p_obj->vertex_data_transformed[poly.vertex_index[1]];
 		vertex3d v2 = p_obj->vertex_data_transformed[poly.vertex_index[2]];
 
-		//printf("v0:x%f,y:%f\n",v0.x,v0.y);
-		//printf("v1:x%f,y:%f\n",v1.x,v1.y);
-		//printf("v2:x%f,y:%f\n",v2.x,v2.y);
-
 		vertex2d v00,v11,v22;
 		v00.x = v0.x;
 		v00.y = v0.y;
@@ -130,7 +126,7 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 		v22.x = v2.x;
 		v22.y = v2.y;
 		v22.color = v2.color;
-
+		/*
 		v00.x += 1;
 		v00.y += 1;
 
@@ -148,7 +144,7 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 
 		v22.x *= screen_w;
 		v22.y *= screen_h;
-
+		*/
 		/*if (v00.x<0)
 			v00.x = 0;
 		if (v00.x>screen_w)
@@ -262,10 +258,10 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 }
 
 //物体相机变换
-void ObjectCameraTransform(Ojbect_Ptr p_ojb,Camera_Ptr camera)
+void ObjectCameraTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 {	
 	//再旋转
-	Matrix3 camera_rotate_matrix = get_matrix_from_x_y_z_axis_angle(-camera->angle_x,-camera->angle_y,-camera->angle_z);
+	/*Matrix3 camera_rotate_matrix = get_matrix_from_x_y_z_axis_angle(-camera->angle_x,-camera->angle_y,-camera->angle_z);
 	//先平移
 	for (int i=0;i<p_ojb->vertex_count;i++)
 	{
@@ -284,18 +280,65 @@ void ObjectCameraTransform(Ojbect_Ptr p_ojb,Camera_Ptr camera)
 
 		p_ojb->vertex_data_transformed[i] = v;
 	}
+	*/
+	vector3 v;
+	for (int i=0;i<p_obj->vertex_count;i++)
+	{	
+		v.x = p_obj->vertex_data_transformed[i].x;
+		v.y = p_obj->vertex_data_transformed[i].y;
+		v.z = p_obj->vertex_data_transformed[i].z;
+
+		//执行相机变换
+		v = p_camera->matrix_camera * v;
+		//
+		p_obj->vertex_data_transformed[i].x = v.x/v.z;
+		p_obj->vertex_data_transformed[i].y = v.y/v.z;
+		p_obj->vertex_data_transformed[i].z = v.z;
+	}
 
 }
 
 //透视变换，把3D坐标转换成2D坐标
-void ObjectProjectTransform(Ojbect_Ptr p_obj)
+void ObjectProjectTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 {
-	for (int i=0;i<p_obj->vertex_count;i++)
+	/*for (int i=0;i<p_obj->vertex_count;i++)
 	{
 		p_obj->vertex_data_transformed[i].x= p_obj->vertex_data_transformed[i].x / p_obj->vertex_data_transformed[i].z;
 		p_obj->vertex_data_transformed[i].y= p_obj->vertex_data_transformed[i].y / p_obj->vertex_data_transformed[i].z;
+	}*/
+	vector3 v;
+	for (int i=0;i<p_obj->vertex_count;i++)
+	{	
+		v.x = p_obj->vertex_data_transformed[i].x;
+		v.y = p_obj->vertex_data_transformed[i].y;
+		v.z = p_obj->vertex_data_transformed[i].z;
+
+		//执行投影变换
+		v = p_camera->matrix_projection * v;
+		//
+		p_obj->vertex_data_transformed[i].x = v.x/v.z;
+		p_obj->vertex_data_transformed[i].y = v.y/v.z;
+		p_obj->vertex_data_transformed[i].z = v.z;
 	}
 }
 
+
+void ObjectScreenTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
+{
+	vector3 v;
+	for (int i=0;i<p_obj->vertex_count;i++)
+	{	
+		v.x = p_obj->vertex_data_transformed[i].x;
+		v.y = p_obj->vertex_data_transformed[i].y;
+		v.z = p_obj->vertex_data_transformed[i].z;
+
+		//执行屏幕变换
+		v = p_camera->matrix_screen * v;
+		//把变换完的坐标拷贝回去
+		 p_obj->vertex_data_transformed[i].x = v.x;
+		 p_obj->vertex_data_transformed[i].y = v.y;
+		 p_obj->vertex_data_transformed[i].z = v.z;
+	}
+}
 
 #endif

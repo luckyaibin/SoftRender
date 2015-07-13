@@ -54,7 +54,7 @@ void InitUVNCamera(
 	UVNCamera_Ptr	p_uvn_camera,
 	CAMERA_TYPE		cam_type,
 	vector3			cam_pos,
-	vector3			euler_cam_direction,//当时eruler相机是，里面是相机的朝向
+	vector3_ptr		p_euler_cam_direction,//当时eruler相机是，里面是相机的朝向
 	vector3_ptr		p_target_pos,
 	vector3_ptr		p_v,
 	int				is_target_need_compute,//是否需要根据朝向来计算
@@ -67,14 +67,25 @@ void InitUVNCamera(
 {
 	p_uvn_camera->camera_type = cam_type;
 	p_uvn_camera->world_pos = cam_pos;
-	p_uvn_camera->euler_cam_direction = euler_cam_direction;
+	if (p_euler_cam_direction)
+		p_uvn_camera->euler_cam_direction = *p_euler_cam_direction;
 	//目标点的坐标
 	if(p_target_pos)
 		p_uvn_camera->uvn_target_pos = *p_target_pos;
+
+	//两个都为空，不允许
+	if ( (NULL == p_euler_cam_direction)&&(NULL==p_target_pos) )
+	{
+		exit(-1);
+	}
 	//上向量
 	if (p_v)
 		p_uvn_camera->v = *p_v;	
-
+	//如果为unv相机，一定要给出v向量
+	if ( (CT_UVN == cam_type) && (NULL == p_v))
+	{
+		exit(-1);
+	}
 	p_uvn_camera->is_target_need_compute = is_target_need_compute;
 
 	p_uvn_camera->near_z = near_z;
@@ -193,5 +204,21 @@ void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 			0,					0,					0,					1);
 		p_uvn_camera->matrix_camera = m4*m_move;
 	}
+
+	//设置投影矩阵
+	Matrix4 m_projection(
+							p_uvn_camera->view_distance,0,							0,								0,
+							0,							p_uvn_camera->view_distance,0,								0,
+							0,							0,							1,								0,
+							0,							0,							1,								0);
+	p_uvn_camera->matrix_projection = m_projection;
+
+	//设置屏幕转换矩阵
+	Matrix4 m_screen(
+						p_uvn_camera->screen_width/2,			0,									0,				p_uvn_camera->screen_width/2,
+						0,										p_uvn_camera->screen_height/2,		0,				p_uvn_camera->screen_height/2,
+						0,										0,									1,				0,
+						0,										0,									0,				1);
+	p_uvn_camera->matrix_screen = m_screen;
 }
 #endif

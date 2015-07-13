@@ -42,7 +42,8 @@ void WaitClock()
 	}
 }
 Object g_obj;
-Camera g_camera;
+UVNCamera g_camera;
+vector3 g_camera_target_pos(0,0,5);
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -50,7 +51,23 @@ int32_t Game_Init()
 	freopen( "CONOUT$","w",stdout);
 
 	ObjectInit(&g_obj);
-	g_camera.world_pos = vector3(0,0,5);
+	//g_camera.world_pos = vector3(0,0,5);
+
+	vector3 init_v(0,1,0);
+	InitUVNCamera(&g_camera,
+		CT_UVN,
+		vector3(0,0,5),
+		NULL,
+		&g_camera_target_pos,
+		&init_v,
+		0,
+		-1,
+		-100,
+		PI/2,
+		600,
+		400
+		);
+
 	return 1;
 }
 int32_t g_drawed = 0;
@@ -89,16 +106,16 @@ int32_t Game_Main()
 	0,1,0,0,
 	0,0,1,0,
 	0,0,0,1);*/
-	ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL_TO_TRANS);
-
+	//ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL_TO_TRANS);
+	CameraUpdateMatrix(&g_camera);
 	ObjectWorldTransform(&g_obj,TT_TRANS);
 	//g_camera.word_pos.x +=0.1f;
 	//if (g_camera.word_pos.x>5)
 	//	g_camera.word_pos.x =0;
 	ObjectCameraTransform(&g_obj,&g_camera);
-	ObjectProjectTransform(&g_obj);
+	ObjectProjectTransform(&g_obj,&g_camera);
 
-
+	ObjectScreenTransform(&g_obj,&g_camera);
 	ObjectDraw(&g_obj,200,100);
 
  
