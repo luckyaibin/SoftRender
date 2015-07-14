@@ -37,12 +37,19 @@ typedef struct Object_Type{
 	//triangle3d triangles[MAX_OsBJECT_TRIANGLES];//三角形的数据
 	Poly_Type triangle_list[MAX_OBJECT_TRIANGLES];//三角形列表数据
 
+	int is_show_obj_coord;
+	vertex3d obj_coords[6];
+	//vertex3d coord_x_start,coord_x_end;
+	//vertex3d coord_y_start,coord_y_end;
+	//vertex3d coord_z_start,coord_z_end;
+
+
 	
 
 }Object,*Ojbect_Ptr;
 
 
-void ObjectInit_old(Ojbect_Ptr obj)
+void ObjectInit(Ojbect_Ptr obj)
 {
 	obj->world_coord = vector3(0,0,0);
 	obj->vertex_count = 4;
@@ -103,8 +110,18 @@ void ObjectInit_old(Ojbect_Ptr obj)
 	p.vertex_index[2]=2;
 	obj->triangle_list[3] = p;
 
+
+	obj->obj_coords[0] = vertex3d(0,0,0,ARGB(255,255,0,0));
+	obj->obj_coords[1]   = vertex3d(15,0,0,ARGB(255,255,0,0));
+
+	obj->obj_coords[2] = vertex3d(0,0,0,ARGB(255,0,255,0));
+	obj->obj_coords[3] = vertex3d(0,15,0,ARGB(255,0,255,0));
+
+	obj->obj_coords[4] = vertex3d(0,0,0,ARGB(255,0,0,255));
+	obj->obj_coords[5] = vertex3d(0,0,15,ARGB(255,0,0,255));
+
 }
-void ObjectInit(Ojbect_Ptr obj)
+void ObjectInit_new(Ojbect_Ptr obj)
 {
 	obj->world_coord = vector3(0,0,0);
 	obj->vertex_count = 12;
@@ -236,6 +253,43 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 
 		DrawTriangleWithEdgeEquation(v00,v11,v22,0);
 	}
+	for (int i=0;i<3;i++)
+	{
+		vertex3d vx0 = p_obj->obj_coords[2*i];
+		vertex3d vx1 = p_obj->obj_coords[2*i+1];
+		vertex2d v00,v11;
+		v00.x = vx0.x;
+		v00.y = vx0.y;
+		v00.color = vx0.color;
+
+		v11.x = vx1.x;
+		v11.y = vx1.y;
+		v11.color = vx1.color;
+
+
+		if(v00.x < 0 )
+			v00.x=0;
+		if (v00.y < 0)
+			v00.y = 0;
+		if(v00.x>screen_w)
+			v00.x = screen_w-1;
+		if(v00.y>screen_h)
+			v00.y = screen_h-1;
+
+		if(v11.x < 0 )
+			v11.x=0;
+		if (v11.y < 0)
+			v11.y = 0;
+		if(v11.x>screen_w)
+			v11.x = screen_w;
+		if(v11.y>screen_h)
+			v11.y = screen_h;
+
+		DrawLine(v00.x,v00.y,v11.x,v11.y,v00.color);
+
+
+	}
+
 }
 
 void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
@@ -252,6 +306,7 @@ void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
 			p_obj->vertex_data_local[i].y = vr.y;
 			p_obj->vertex_data_local[i].z = vr.z;
 		}
+		
 		break;
 	case TT_TRANS:
 		for (int i=0;i<p_obj->vertex_count;i++)
@@ -278,6 +333,27 @@ void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
 		}
 		break;
 	default:break;
+	}
+	for (int i=0;i<6;i++)
+	{
+		vertex3d vx = p_obj->obj_coords[i];
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
+			printf("nan...");
+		vector3 vr(vx.x,vx.y,vx.z);
+		vr = mt*vr;
+		if(IS_FLOAT_NAN(vr.x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(vr.y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(vr.z))
+			printf("nan...");
+		p_obj->obj_coords[i].x = vr.x;
+		p_obj->obj_coords[i].y = vr.y;
+		p_obj->obj_coords[i].z = vr.z;
 	}
 }
 //把物体坐标转换成世界坐标
@@ -319,6 +395,21 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 		break;
 	default:break;
 	}
+	for (int i=0;i<6;i++)
+	{
+		vertex3d v = p_obj->obj_coords[i];
+		v.x += p_obj->world_coord.x;
+		v.y += p_obj->world_coord.y;
+		v.z += p_obj->world_coord.z;
+
+		if(IS_FLOAT_NAN(v.x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.z))
+			printf("nan...");
+		p_obj->obj_coords[i] = v;
+	}
 }
 
 //物体相机变换
@@ -351,14 +442,57 @@ void ObjectCameraTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 		v.x = p_obj->vertex_data_transformed[i].x;
 		v.y = p_obj->vertex_data_transformed[i].y;
 		v.z = p_obj->vertex_data_transformed[i].z;
-		vector_dump(v);
+		//vector_dump(v);
 		//执行相机变换
 		v = p_camera->matrix_camera * v;
-		vector_dump(v);
+		//vector_dump(v);
 		//
 		p_obj->vertex_data_transformed[i].x = v.x/v.z;
 		p_obj->vertex_data_transformed[i].y = v.y/v.z;
 		p_obj->vertex_data_transformed[i].z = v.z;
+	}
+
+	for (int i=0;i<6;i++)
+	{	
+		vector3 vv;
+		vv.x = p_obj->obj_coords[i].x;
+		vv.y = p_obj->obj_coords[i].y;
+		vv.z = p_obj->obj_coords[i].z;
+
+		if(IS_FLOAT_NAN(vv.x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(vv.y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(vv.z))
+			printf("nan...");
+
+
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
+			printf("nan...");
+		//vector_dump(v);
+		//执行相机变换
+		v = p_camera->matrix_camera * vv;
+		if(IS_FLOAT_NAN(v.x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.z))
+			printf("nan...");
+		//
+		p_obj->obj_coords[i].x = v.x/v.z;
+		p_obj->obj_coords[i].y = v.y/v.z;
+		 
+		p_obj->obj_coords[i].z = v.z;
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
+			printf("nan...");
 	}
 
 }
@@ -385,6 +519,40 @@ void ObjectProjectTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 		p_obj->vertex_data_transformed[i].y = v.y/v.z;
 		p_obj->vertex_data_transformed[i].z = v.z;
 	}
+
+	for (int i=0;i<6;i++)
+	{	
+		v.x = p_obj->obj_coords[i].x;
+		v.y = p_obj->obj_coords[i].y;
+		v.z = p_obj->obj_coords[i].z;
+
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
+			printf("nan...");
+		//vector_dump(v);
+		//执行相机变换
+		v = p_camera->matrix_projection * v;
+		//vector_dump(v);
+		if(IS_FLOAT_NAN(v.x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.z))
+			printf("nan...");
+		p_obj->obj_coords[i].x = v.x/v.z;
+		p_obj->obj_coords[i].y = v.y/v.z;
+		p_obj->obj_coords[i].z = v.z;
+		
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
+			printf("nan...");
+	}
 }
 
 
@@ -403,6 +571,31 @@ void ObjectScreenTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 		 p_obj->vertex_data_transformed[i].x = v.x;
 		 p_obj->vertex_data_transformed[i].y = v.y;
 		 p_obj->vertex_data_transformed[i].z = v.z;
+	}
+
+	for (int i=0;i<6;i++)
+	{	
+		v.x = p_obj->obj_coords[i].x;
+		v.y = p_obj->obj_coords[i].y;
+		v.z = p_obj->obj_coords[i].z;
+		//执行屏幕变换
+		v = p_camera->matrix_screen * v;
+		if(IS_FLOAT_NAN(v.x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(v.z))
+			printf("nan...");
+		p_obj->obj_coords[i].x = v.x/v.z;
+		p_obj->obj_coords[i].y = v.y/v.z;
+		p_obj->obj_coords[i].z = v.z;
+
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
+			printf("nan...");
 	}
 }
 

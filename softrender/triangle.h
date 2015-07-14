@@ -8,6 +8,18 @@
 struct vertex3d{
 	float x,y,z;
 	ARGB color;
+	vertex3d()
+	{
+		x=y=z=0;
+		color=0;
+	}
+	vertex3d(float _1,float _2,float _3,ARGB _4)
+	{
+		x=_1;
+		y=_2;
+		z=_3;
+		color=_4;
+	}
 };
 //三角形的定义，里面包含三个顶点
 struct triangle3d_vertex{

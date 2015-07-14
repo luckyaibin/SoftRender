@@ -112,8 +112,8 @@ int32_t Game_Main()
 	
 	RECT rect;
 	rect.left=0;
-	rect.bottom = 400;
-	rect.right = 500;
+	rect.bottom = 25;
+	rect.right = 12;
 	rect.top = 0;
 	pDevice->BeginScene();
 	int re = g_font->DrawText(NULL,
@@ -182,16 +182,34 @@ int32_t Game_Main()
 	
 	CameraUpdateMatrix(&g_camera);
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
+
+	for(int i=0;i<6;i++)
+	{
+		if(IS_FLOAT_NAN(g_obj.obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(g_obj.obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(g_obj.obj_coords[i].z))
+			printf("nan...");
+	}
 	//g_camera.word_pos.x +=0.1f;
 	//if (g_camera.word_pos.x>5)
 	//	g_camera.word_pos.x =0;
 	ObjectCameraTransform(&g_obj,&g_camera);
+	for(int i=0;i<6;i++)
+	{
+		if(IS_FLOAT_NAN(g_obj.obj_coords[i].x))
+			printf("nan...");
+		if(IS_FLOAT_NAN(g_obj.obj_coords[i].y))
+			printf("nan...");
+		if(IS_FLOAT_NAN(g_obj.obj_coords[i].z))
+			printf("nan...");
+	}
 	ObjectProjectTransform(&g_obj,&g_camera);
 
 	ObjectScreenTransform(&g_obj,&g_camera);
 	ObjectDraw(&g_obj,600,400);
-
- 
+	 
 	//DrawTriangleWithEdgeEquation
 	for(int32_t i=0;i<-1000;i++)
 	{
