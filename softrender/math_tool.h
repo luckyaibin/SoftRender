@@ -3,6 +3,8 @@
 #include "base_type.h"
 #include <float.h>
 #include <stdio.h>
+#include <math.h>
+#include <string.h>
 //指数全为1，尾数全为0表示无穷，正、负无穷看符号位决定
 #define IS_FLOAT_INFINITE(f) ( (((FLOAT_FORMAT*)(&f))->exponent == 0xFF) && (((FLOAT_FORMAT*)(&f))->mantissa == 0) )
 
@@ -342,6 +344,31 @@ inline float fixpoint_to_float(int32_t i,int32_t fractbits)
 		f = -f;
 	return f;
 }
-
-
+ 
+inline int _matherr__( struct _exception *except )
+{
+	/* Handle _DOMAIN errors for log or log10. */
+	if( except->type == _DOMAIN )
+	{
+		if( strcmp( except->name, "log" ) == 0 )
+		{
+			except->retval = log( -(except->arg1) );
+			printf( "Special: using absolute value: %s: _DOMAIN "
+				"error\n", except->name );
+			return 1;
+		}
+		else if( strcmp( except->name, "log10" ) == 0 )
+		{
+			except->retval = log10( -(except->arg1) );
+			printf( "Special: using absolute value: %s: _DOMAIN "
+				"error\n", except->name );
+			return 1;
+		}
+	}
+	else
+	{
+		printf( "Normal: " );
+		return 0;    /* Else use the default actions */
+	}
+}
 #endif

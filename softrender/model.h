@@ -477,7 +477,14 @@ void ObjectCameraTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 		//执行相机变换
 		v = p_camera->matrix_camera * vv;
 		if(IS_FLOAT_NAN(v.x))
+		{
+			if (IS_FLOAT_NAN(vv.x))
+			{
+				printf("nan.....");
+			}
 			printf("nan...");
+			v = p_camera->matrix_camera * vv;
+		}
 		if(IS_FLOAT_NAN(v.y))
 			printf("nan...");
 		if(IS_FLOAT_NAN(v.z))

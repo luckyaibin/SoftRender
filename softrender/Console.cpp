@@ -110,6 +110,10 @@ int32_t Game_Main()
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
 	
+	float zero=0.0f;
+	float inf = 1.0f/zero;
+	float nan = inf*0.0;
+
 	RECT rect;
 	rect.left=0;
 	rect.bottom = 25;
