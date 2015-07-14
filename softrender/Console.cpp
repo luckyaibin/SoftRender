@@ -44,12 +44,35 @@ void WaitClock()
 Object g_obj;
 UVNCamera g_camera;
 vector3 g_camera_target_pos(0,0,5);
+
+ID3DXFont* g_font=0;
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
-	AllocConsole();
-	freopen( "CONOUT$","w",stdout);
+	//AllocConsole();
+//	freopen( "CONOUT$","w",stdout);
 
+	D3DXFONT_DESC lf;
+	ZeroMemory(&lf, sizeof(D3DXFONT_DESC));
+	lf.Height         = 25;    // in logical units
+	lf.Width          = 12;    // in logical units 
+	lf.Weight         = 500;   // boldness, range 0(light) - 1000(bold)
+	lf.Italic         = false;
+	lf.CharSet        = DEFAULT_CHARSET;
+	lf.Quality        = 0;
+	lf.PitchAndFamily = 0;
+	strcpy(lf.FaceName, "Times New Roman"); // font style
+	//
+	// Create an ID3DXFont based on 'lf'.
+	//
+	int err = 0;
+	if(err=D3DXCreateFontIndirect(pDevice, &lf, &g_font))
+	{
+		::MessageBox(0, "D3DXCreateFontIndirect() - FAILED", 0, 0);
+		::PostQuitMessage(0);
+	}
+ 
+	int la = GetLastError();
 	ObjectInit(&g_obj);
 	//g_camera.world_pos = vector3(0,0,5);
 
@@ -75,8 +98,11 @@ int32_t g_drawed = 0;
 
 float g_angle_y = 0;
 float g_angle_x = 0;
+float g_diff = 0.1;
 
- 
+float g_x_value = 0.0f;
+float g_y_value = 0.0f;
+float g_z_value = 5.0f;
 
 int32_t Game_Main()
 {
@@ -84,6 +110,19 @@ int32_t Game_Main()
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
 	
+	RECT rect;
+	rect.left=0;
+	rect.bottom = 400;
+	rect.right = 500;
+	rect.top = 0;
+	pDevice->BeginScene();
+	int re = g_font->DrawText(NULL,
+		"Hello World", // String to draw.
+		5, // Null terminating string.
+		&rect, // Rectangle to draw the string in.
+		DT_TOP | DT_LEFT, // Draw in top-left corner of rect.
+		0xff00ffff); // Black.
+	pDevice->EndScene();
 	g_angle_y += 0.01f;
 	if (g_angle_y>2*PI)
 	{
@@ -107,8 +146,40 @@ int32_t Game_Main()
 	0,0,1,0,
 	0,0,0,1);*/
 	//ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL_TO_TRANS);
-	g_camera.world_pos.x += 0.01;
-	g_camera.world_pos.x = fmod(g_camera.world_pos.x,4);
+	//g_camera.world_pos.x += 0.01;
+	//g_camera.world_pos.x = fmod(g_camera.world_pos.x,4)
+	if (KEY_DOWN('S'))
+	{
+		g_x_value += 0.01;
+	}
+	if (KEY_DOWN('X'))
+	{
+		g_x_value -= 0.01;
+	}
+
+	if (KEY_DOWN('7'))
+	{
+		g_y_value += 0.01;
+	}
+	if (KEY_DOWN('Y'))
+	{
+		g_y_value -= 0.01;
+	}
+	if (KEY_DOWN('A'))
+	{
+		g_z_value += 0.01;
+	}
+	if (KEY_DOWN('Z'))
+	{
+		g_z_value -= 0.01;
+	}
+
+	g_camera.world_pos.x = g_x_value;
+	g_camera.world_pos.y = g_y_value;
+	g_camera.world_pos.z = g_z_value;
+	
+	
+	
 	CameraUpdateMatrix(&g_camera);
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
 	//g_camera.word_pos.x +=0.1f;
@@ -118,7 +189,7 @@ int32_t Game_Main()
 	ObjectProjectTransform(&g_obj,&g_camera);
 
 	ObjectScreenTransform(&g_obj,&g_camera);
-	ObjectDraw(&g_obj,200,100);
+	ObjectDraw(&g_obj,600,400);
 
  
 	//DrawTriangleWithEdgeEquation

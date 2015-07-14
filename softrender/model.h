@@ -42,10 +42,72 @@ typedef struct Object_Type{
 }Object,*Ojbect_Ptr;
 
 
-void ObjectInit(Ojbect_Ptr obj)
+void ObjectInit_old(Ojbect_Ptr obj)
 {
 	obj->world_coord = vector3(0,0,0);
 	obj->vertex_count = 4;
+	//obj.triangle_list[0] = 
+	vertex3d *v = new vertex3d();
+	v->x = 0;
+	v->y = 0;
+	v->z = 2;
+	v->color = RGB(255,0,0);
+	obj->vertex_data_local[0] = *v;
+
+	v = new vertex3d();
+	v->x = -1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(0,255,0);
+	obj->vertex_data_local[1] = *v;
+
+	v = new vertex3d();
+	v->x = 1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(0,0,255);
+	obj->vertex_data_local[2] = *v;
+
+	v = new vertex3d();
+	v->x = 0;
+	v->y = 1;
+	v->z = 0;
+	v->color = RGB(0,0,100);
+	obj->vertex_data_local[3] = *v;
+
+	obj->triangle_count = 4;
+	Poly p;
+	p.p_parent = obj;
+	p.vertex_index[0]=0;
+	p.vertex_index[1]=3;
+	p.vertex_index[2]=1;
+	obj->triangle_list[0] = p;
+
+	p.p_parent = obj;
+	p.vertex_index[0]=0;
+	p.vertex_index[1]=1;
+	p.vertex_index[2]=2;
+	obj->triangle_list[1] = p;
+
+
+	p.p_parent = obj;
+	p.vertex_index[0]=0;
+	p.vertex_index[1]=2;
+	p.vertex_index[2]=3;
+	obj->triangle_list[2] = p;
+
+
+	p.p_parent = obj;
+	p.vertex_index[0]=1;
+	p.vertex_index[1]=3;
+	p.vertex_index[2]=2;
+	obj->triangle_list[3] = p;
+
+}
+void ObjectInit(Ojbect_Ptr obj)
+{
+	obj->world_coord = vector3(0,0,0);
+	obj->vertex_count = 12;
 	//obj.triangle_list[0] = 
 	vertex3d *v = new vertex3d();
 	v->x = 0;

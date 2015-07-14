@@ -1,5 +1,8 @@
 #include "draw.h"
 
+IDirect3DDevice9* pDevice=NULL ;
+IDirect3DSurface9* pSurface=NULL;
+
 bool Init3DLib(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height)
 {
 	IDirect3D9* d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
