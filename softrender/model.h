@@ -39,6 +39,7 @@ typedef struct Object_Type{
 
 	int is_show_obj_coord;
 	vertex3d obj_coords[6];
+	vertex3d obj_coords_transformed[6];
 	//vertex3d coord_x_start,coord_x_end;
 	//vertex3d coord_y_start,coord_y_end;
 	//vertex3d coord_z_start,coord_z_end;
@@ -48,6 +49,84 @@ typedef struct Object_Type{
 
 }Object,*Ojbect_Ptr;
 
+
+void check_obj_coord(Ojbect_Ptr p_obj)
+{
+	for(int i=0;i<6;i++)
+	{
+		if(IS_FLOAT_INVALID_NUM(p_obj->obj_coords[i].x))
+		{
+			int is_nan = IS_FLOAT_NAN(p_obj->obj_coords[i].x);
+			int is_infinite = IS_FLOAT_INFINITE(p_obj->obj_coords[i].x);
+			printf("nan...");
+			return;
+		}
+		if(IS_FLOAT_INVALID_NUM(p_obj->obj_coords[i].y))
+		{
+			int is_nan = IS_FLOAT_NAN(p_obj->obj_coords[i].y);
+			int is_infinite = IS_FLOAT_INFINITE(p_obj->obj_coords[i].y);
+			printf("nan...");
+			return ;
+		}
+		if(IS_FLOAT_INVALID_NUM(p_obj->obj_coords[i].z))
+		{
+			int is_nan = IS_FLOAT_NAN(p_obj->obj_coords[i].z);
+			int is_infinite = IS_FLOAT_INFINITE(p_obj->obj_coords[i].z);
+			printf("nan...");
+			return ;
+		}
+	}
+}
+
+void check_vector3_value(vector3 v)
+{
+	if(IS_FLOAT_INVALID_NUM(v.x))
+	{
+		int is_nan = IS_FLOAT_NAN(v.x);
+		int is_infinite = IS_FLOAT_INFINITE(v.x);
+		printf("nan...");
+		return;
+	}
+	if(IS_FLOAT_INVALID_NUM(v.y))
+	{
+		int is_nan = IS_FLOAT_NAN(v.y);
+		int is_infinite = IS_FLOAT_INFINITE(v.y);
+		printf("nan...");
+		return;
+	}
+	if(IS_FLOAT_INVALID_NUM(v.z))
+	{
+		int is_nan = IS_FLOAT_NAN(v.z);
+		int is_infinite = IS_FLOAT_INFINITE(v.z);
+		printf("nan...");
+		return;
+	}
+}
+
+void check_vertex3d_value(vertex3d v)
+{
+	if(IS_FLOAT_INVALID_NUM(v.x))
+	{
+		int is_nan = IS_FLOAT_NAN(v.x);
+		int is_infinite = IS_FLOAT_INFINITE(v.x);
+		printf("nan...");
+		return;
+	}
+	if(IS_FLOAT_INVALID_NUM(v.y))
+	{
+		int is_nan = IS_FLOAT_NAN(v.y);
+		int is_infinite = IS_FLOAT_INFINITE(v.y);
+		printf("nan...");
+		return;
+	}
+	if(IS_FLOAT_INVALID_NUM(v.z))
+	{
+		int is_nan = IS_FLOAT_NAN(v.z);
+		int is_infinite = IS_FLOAT_INFINITE(v.z);
+		printf("nan...");
+		return;
+	}
+}
 
 void ObjectInit(Ojbect_Ptr obj)
 {
@@ -205,58 +284,12 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 		v22.x = v2.x;
 		v22.y = v2.y;
 		v22.color = v2.color;
-		/*
-		v00.x += 1;
-		v00.y += 1;
-
-		v11.x += 1;
-		v11.y += 1;
-
-		v22.x += 1;
-		v22.y += 1;
-
-		v00.x *= screen_w;
-		v00.y *= screen_h;
-
-		v11.x *= screen_w;
-		v11.y *= screen_h;
-
-		v22.x *= screen_w;
-		v22.y *= screen_h;
-		*/
-		/*if (v00.x<0)
-			v00.x = 0;
-		if (v00.x>screen_w)
-			v00.x=screen_w;
-		if (v00.y<0)
-			v00.y=0;
-		if (v00.y>screen_h)
-			v00.y=screen_h;
-
-		if (v11.x<0)
-			v11.x = 0;
-		if (v11.x>screen_w)
-			v11.x=screen_w;
-		if (v11.y<0)
-			v11.y=0;
-		if (v11.y>screen_h)
-			v11.y=screen_h;
-
-		if (v22.x<0)
-			v22.x = 0;
-		if (v22.x>screen_w)
-			v22.x=screen_w;
-		if (v22.y<0)
-			v22.y=0;
-		if (v22.y>screen_h)
-			v22.y=screen_h;*/
-
-		DrawTriangleWithEdgeEquation(v00,v11,v22,0);
+	 	DrawTriangleWithEdgeEquation(v00,v11,v22,0);
 	}
 	for (int i=0;i<3;i++)
 	{
-		vertex3d vx0 = p_obj->obj_coords[2*i];
-		vertex3d vx1 = p_obj->obj_coords[2*i+1];
+		vertex3d vx0 = p_obj->obj_coords_transformed[2*i];
+		vertex3d vx1 = p_obj->obj_coords_transformed[2*i+1];
 		vertex2d v00,v11;
 		v00.x = vx0.x;
 		v00.y = vx0.y;
@@ -306,7 +339,18 @@ void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
 			p_obj->vertex_data_local[i].y = vr.y;
 			p_obj->vertex_data_local[i].z = vr.z;
 		}
-		
+		for (int i=0;i<6;i++)
+		{
+			vertex3d vx = p_obj->obj_coords[i];
+
+			vector3 vr(vx.x,vx.y,vx.z);
+			vr = mt*vr;
+
+			p_obj->obj_coords[i].x = vr.x;
+			p_obj->obj_coords[i].y = vr.y;
+			p_obj->obj_coords[i].z = vr.z;
+		}
+
 		break;
 	case TT_TRANS:
 		for (int i=0;i<p_obj->vertex_count;i++)
@@ -318,6 +362,19 @@ void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
 			p_obj->vertex_data_transformed[i].y = vr.y;
 			p_obj->vertex_data_transformed[i].z = vr.z;
 		}
+
+		for (int i=0;i<6;i++)
+		{
+			vertex3d vx = p_obj->obj_coords_transformed[i];
+
+			vector3 vr(vx.x,vx.y,vx.z);
+			vr = mt*vr;
+
+			p_obj->obj_coords_transformed[i].x = vr.x;
+			p_obj->obj_coords_transformed[i].y = vr.y;
+			p_obj->obj_coords_transformed[i].z = vr.z;
+		}
+
 		break;
 	case TT_LOCAL_TO_TRANS:
 		for (int i=0;i<p_obj->vertex_count;i++)
@@ -331,29 +388,19 @@ void ObjectTransform(Ojbect_Ptr p_obj,Matrix4 mt,TRANS_TYPE tt)
 			p_obj->vertex_data_transformed[i].color = vx.color;
 
 		}
+		for (int i=0;i<6;i++)
+		{
+			vertex3d vx = p_obj->obj_coords[i];
+
+			vector3 vr(vx.x,vx.y,vx.z);
+			vr = mt*vr;
+
+			p_obj->obj_coords_transformed[i].x = vr.x;
+			p_obj->obj_coords_transformed[i].y = vr.y;
+			p_obj->obj_coords_transformed[i].z = vr.z;
+		}
 		break;
 	default:break;
-	}
-	for (int i=0;i<6;i++)
-	{
-		vertex3d vx = p_obj->obj_coords[i];
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
-			printf("nan...");
-		vector3 vr(vx.x,vx.y,vx.z);
-		vr = mt*vr;
-		if(IS_FLOAT_NAN(vr.x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(vr.y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(vr.z))
-			printf("nan...");
-		p_obj->obj_coords[i].x = vr.x;
-		p_obj->obj_coords[i].y = vr.y;
-		p_obj->obj_coords[i].z = vr.z;
 	}
 }
 //把物体坐标转换成世界坐标
@@ -388,7 +435,7 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 			v.x += p_obj->world_coord.x;
 			v.y += p_obj->world_coord.y;
 			v.z += p_obj->world_coord.z;
-			vertex3d_dump(v);
+			//vertex3d_dump(v);
 			p_obj->vertex_data_transformed[i] = v;
 			
 		}
@@ -397,19 +444,13 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 	}
 	for (int i=0;i<6;i++)
 	{
-		vertex3d v = p_obj->obj_coords[i];
-		v.x += p_obj->world_coord.x;
-		v.y += p_obj->world_coord.y;
-		v.z += p_obj->world_coord.z;
+		p_obj->obj_coords_transformed[i].x += p_obj->obj_coords[i].x + p_obj->world_coord.x;
+		p_obj->obj_coords_transformed[i].y += p_obj->obj_coords[i].y + p_obj->world_coord.y;
+		p_obj->obj_coords_transformed[i].z += p_obj->obj_coords[i].z + p_obj->world_coord.z;
 
-		if(IS_FLOAT_NAN(v.x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.z))
-			printf("nan...");
-		p_obj->obj_coords[i] = v;
+		 
 	}
+	check_obj_coord(p_obj);
 }
 
 //物体相机变换
@@ -455,51 +496,18 @@ void ObjectCameraTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 	for (int i=0;i<6;i++)
 	{	
 		vector3 vv;
-		vv.x = p_obj->obj_coords[i].x;
-		vv.y = p_obj->obj_coords[i].y;
-		vv.z = p_obj->obj_coords[i].z;
-
-		if(IS_FLOAT_NAN(vv.x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(vv.y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(vv.z))
-			printf("nan...");
-
-
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
-			printf("nan...");
-		//vector_dump(v);
+		vv.x = p_obj->obj_coords_transformed[i].x;
+		vv.y = p_obj->obj_coords_transformed[i].y;
+		vv.z = p_obj->obj_coords_transformed[i].z;
+	 
 		//执行相机变换
 		v = p_camera->matrix_camera * vv;
-		if(IS_FLOAT_NAN(v.x))
-		{
-			if (IS_FLOAT_NAN(vv.x))
-			{
-				printf("nan.....");
-			}
-			printf("nan...");
-			v = p_camera->matrix_camera * vv;
-		}
-		if(IS_FLOAT_NAN(v.y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.z))
-			printf("nan...");
-		//
-		p_obj->obj_coords[i].x = v.x/v.z;
-		p_obj->obj_coords[i].y = v.y/v.z;
 		 
-		p_obj->obj_coords[i].z = v.z;
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
-			printf("nan...");
+		p_obj->obj_coords_transformed[i].x = v.x/v.z;
+		p_obj->obj_coords_transformed[i].y = v.y/v.z;
+		p_obj->obj_coords_transformed[i].z = v.z;
+
+		check_vertex3d_value(p_obj->obj_coords_transformed[i]);
 	}
 
 }
@@ -529,36 +537,23 @@ void ObjectProjectTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 
 	for (int i=0;i<6;i++)
 	{	
-		v.x = p_obj->obj_coords[i].x;
-		v.y = p_obj->obj_coords[i].y;
-		v.z = p_obj->obj_coords[i].z;
+		v.x = p_obj->obj_coords_transformed[i].x;
+		v.y = p_obj->obj_coords_transformed[i].y;
+		v.z = p_obj->obj_coords_transformed[i].z;
 
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
-			printf("nan...");
+		check_vector3_value(v);
+
 		//vector_dump(v);
 		//执行相机变换
 		v = p_camera->matrix_projection * v;
 		//vector_dump(v);
-		if(IS_FLOAT_NAN(v.x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.z))
-			printf("nan...");
-		p_obj->obj_coords[i].x = v.x/v.z;
-		p_obj->obj_coords[i].y = v.y/v.z;
-		p_obj->obj_coords[i].z = v.z;
+		check_vector3_value(v);
+
+		p_obj->obj_coords_transformed[i].x = v.x/v.z;
+		p_obj->obj_coords_transformed[i].y = v.y/v.z;
+		p_obj->obj_coords_transformed[i].z = v.z;
 		
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
-			printf("nan...");
+		check_vertex3d_value(p_obj->obj_coords_transformed[i]);
 	}
 }
 
@@ -582,27 +577,25 @@ void ObjectScreenTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 
 	for (int i=0;i<6;i++)
 	{	
-		v.x = p_obj->obj_coords[i].x;
-		v.y = p_obj->obj_coords[i].y;
-		v.z = p_obj->obj_coords[i].z;
+		v.x = p_obj->obj_coords_transformed[i].x;
+		v.y = p_obj->obj_coords_transformed[i].y;
+		v.z = p_obj->obj_coords_transformed[i].z;
+		vector3 vv_test = v;
+		check_vector3_value(v);
+
 		//执行屏幕变换
 		v = p_camera->matrix_screen * v;
-		if(IS_FLOAT_NAN(v.x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(v.z))
-			printf("nan...");
-		p_obj->obj_coords[i].x = v.x/v.z;
-		p_obj->obj_coords[i].y = v.y/v.z;
-		p_obj->obj_coords[i].z = v.z;
+		
+		check_vector3_value(v);
 
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(p_obj->obj_coords[i].z))
-			printf("nan...");
+		vv_test = p_camera->matrix_screen * vv_test;
+
+
+		p_obj->obj_coords_transformed[i].x = v.x/v.z;
+		p_obj->obj_coords_transformed[i].y = v.y/v.z;
+		p_obj->obj_coords_transformed[i].z = v.z;
+
+		check_vertex3d_value(p_obj->obj_coords_transformed[i]);
 	}
 }
 

@@ -192,9 +192,9 @@ void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 		u = cross_mul(n,v);
 
 		v = cross_mul(u,n);
-		vector_dump(u);
-		vector_dump(v);
-		vector_dump(n);
+		//vector_dump(u);
+		//vector_dump(v);
+		//vector_dump(n);
 		normalize(&u);
 		normalize(&v);
 		normalize(&n);

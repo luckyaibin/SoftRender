@@ -19,6 +19,8 @@ HWND g_WindowHandle;
 HINSTANCE g_HInstance;
 DWORD g_Clock;
 
+uint32_t g_curr_frame_count = 0;
+char g_FPS_str[20];
 // 宏脚本
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
@@ -49,8 +51,8 @@ ID3DXFont* g_font=0;
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
-	//AllocConsole();
-//	freopen( "CONOUT$","w",stdout);
+	AllocConsole();
+	freopen( "CONOUT$","w",stdout);
 
 	D3DXFONT_DESC lf;
 	ZeroMemory(&lf, sizeof(D3DXFONT_DESC));
@@ -64,13 +66,8 @@ int32_t Game_Init()
 	strcpy(lf.FaceName, "Times New Roman"); // font style
 	//
 	// Create an ID3DXFont based on 'lf'.
-	//
-	int err = 0;
-	if(err=D3DXCreateFontIndirect(pDevice, &lf, &g_font))
-	{
-		::MessageBox(0, "D3DXCreateFontIndirect() - FAILED", 0, 0);
-		::PostQuitMessage(0);
-	}
+	D3DXCreateFontIndirect(pDevice, &lf, &g_font);
+	 
  
 	int la = GetLastError();
 	ObjectInit(&g_obj);
@@ -96,8 +93,8 @@ int32_t Game_Init()
 int32_t g_drawed = 0;
 
 
-float g_angle_y = 0;
-float g_angle_x = 0;
+ 
+ 
 float g_diff = 0.1;
 
 float g_x_value = 0.0f;
@@ -106,52 +103,12 @@ float g_z_value = 5.0f;
 
 int32_t Game_Main()
 {
-	 
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
-	
-	float zero=0.0f;
-	float inf = 1.0f/zero;
-	float nan = inf*0.0;
-
-	RECT rect;
-	rect.left=0;
-	rect.bottom = 25;
-	rect.right = 12;
-	rect.top = 0;
 	pDevice->BeginScene();
-	int re = g_font->DrawText(NULL,
-		"Hello World", // String to draw.
-		5, // Null terminating string.
-		&rect, // Rectangle to draw the string in.
-		DT_TOP | DT_LEFT, // Draw in top-left corner of rect.
-		0xff00ffff); // Black.
-	pDevice->EndScene();
-	g_angle_y += 0.01f;
-	if (g_angle_y>2*PI)
-	{
-		g_angle_y = 0.0;
-	}
-	g_angle_y = mod_pi(g_angle_y);
-
-	//g_angle_x += 0.003f;
-	//g_angle_x = mod_pi(g_angle_x);
-	if (g_angle_x>2*PI)
-	{
-		g_angle_x -= 2*PI;
-	}
-	//printf("g_angle_x %f \n",g_angle_x / PI * 360);
-	//printf("g_angle_y %f \n",g_angle_y / PI * 360);
-
-	Matrix3 m_rotate3x3 = get_matrix_from_x_y_z_axis_angle(g_angle_x,g_angle_y,0);
-	Matrix4 m_rotate4x4 = m_rotate3x3;
-	/*m_rotate4x4 = Matrix4(1,0,0,0,
-	0,1,0,0,
-	0,0,1,0,
-	0,0,0,1);*/
-	//ObjectTransform(&g_obj,m_rotate4x4,TT_LOCAL_TO_TRANS);
-	//g_camera.world_pos.x += 0.01;
-	//g_camera.world_pos.x = fmod(g_camera.world_pos.x,4)
+ 
+	show_frame();
+  
 	if (KEY_DOWN('S'))
 	{
 		g_x_value += 0.01;
@@ -182,70 +139,30 @@ int32_t Game_Main()
 	g_camera.world_pos.y = g_y_value;
 	g_camera.world_pos.z = g_z_value;
 	
+	//重置坐标轴的坐标，防止计算的误差积累
+	for (int i=0;i<6;i++)
+	{
+		g_obj.obj_coords_transformed[i] = g_obj.obj_coords[i];
+	}
 	
 	
 	CameraUpdateMatrix(&g_camera);
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
 
-	for(int i=0;i<6;i++)
-	{
-		if(IS_FLOAT_NAN(g_obj.obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(g_obj.obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(g_obj.obj_coords[i].z))
-			printf("nan...");
-	}
+	
 	//g_camera.word_pos.x +=0.1f;
 	//if (g_camera.word_pos.x>5)
 	//	g_camera.word_pos.x =0;
 	ObjectCameraTransform(&g_obj,&g_camera);
-	for(int i=0;i<6;i++)
-	{
-		if(IS_FLOAT_NAN(g_obj.obj_coords[i].x))
-			printf("nan...");
-		if(IS_FLOAT_NAN(g_obj.obj_coords[i].y))
-			printf("nan...");
-		if(IS_FLOAT_NAN(g_obj.obj_coords[i].z))
-			printf("nan...");
-	}
+	 
 	ObjectProjectTransform(&g_obj,&g_camera);
 
 	ObjectScreenTransform(&g_obj,&g_camera);
 	ObjectDraw(&g_obj,600,400);
-	 
-	//DrawTriangleWithEdgeEquation
-	for(int32_t i=0;i<-1000;i++)
-	{
-		vertex2d v1,v2,v3;
-		 int32_t a = rand()%255;
-		 int32_t r = rand()%255;
-		 int32_t g = rand()%255;
-		 int32_t b = rand()%255;
-		v1.x = rand() % 400;
-		v1.y = rand() % 400;
-		v1.color = ARGB(a,255,0,0);
-
-		a = rand()%255;
-		r = rand()%255;
-		g = rand()%255;
-		b = rand()%255;
-		v2.x = rand() % 400;
-		v2.y = rand() % 400;
-		v2.color = ARGB(a,0,255,0);
-		a = rand()%255;
-		r = rand()%255;
-		g = rand()%255;
-		b = rand()%255;
-		v3.x = rand() % 400;
-		v3.y = rand() % 400;
-		v3.color = ARGB(a,0,0,255);
-
-		DrawTriangleWithEdgeEquation(v1,v2,v3,ARGB(0,rand()% 255,rand()%255,rand()%255));
-		// DrawTriangle(v1,v2,v3,ARGB(0,rand()% 255,rand()%255,rand()%255));
-		// drawTriangle(v1,v2,v3,ARGB(0,rand()% 255,rand()%255,rand()%255));
-	}
-
+	
+	
+	pDevice->EndScene();
+	pDevice->Present(NULL, NULL, NULL, NULL);
 	// 输出
 	FlipSurface();
 

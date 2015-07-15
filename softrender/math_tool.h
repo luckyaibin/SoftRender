@@ -22,6 +22,9 @@
 //NaN，not a number，指数全为1，尾数不为0
 #define IS_FLOAT_NAN(f) ( (((FLOAT_FORMAT*)(&f))->exponent == 0xFF) && (((FLOAT_FORMAT*)(&f))->mantissa) )
 
+//一个数字不是有效的数字（是正负无穷和Nan）
+#define IS_FLOAT_INVALID_NUM(f) (  IS_FLOAT_INFINITE(f)  ||  IS_FLOAT_NAN(f)   )
+
 #define ABS(x) (x>0)?(x):(-x)
 
 inline uint32_t dump_float(float f)

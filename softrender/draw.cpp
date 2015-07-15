@@ -42,9 +42,9 @@ void FlipSurface()
 
 	// GetBackBuffer所得的缓存需要被释放，否则会内存泄露
 	backBuffer->Release();
-
+	//如果不注释掉下面的Present，就不能显示文字，不知道为什么
 	// 将交换链中的后台缓存显示
-	pDevice->Present(0, 0, 0, 0);
+	//pDevice->Present(0, 0, 0, 0);
 }
 
 void Release3DLib()
