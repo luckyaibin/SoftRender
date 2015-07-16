@@ -84,8 +84,8 @@ int32_t Game_Init()
 		-1,
 		-100,
 		PI/2,
-		600,
-		400
+		800,
+		600
 		);
 
 	return 1;
@@ -135,31 +135,22 @@ int32_t Game_Main()
 		g_z_value -= 0.01;
 	}
 
-	g_camera.world_pos.x = g_x_value;
-	g_camera.world_pos.y = g_y_value;
-	g_camera.world_pos.z = g_z_value;
+	g_camera.uvn_target_pos.x = g_x_value;
+	g_camera.uvn_target_pos.y = g_y_value;
+	g_camera.uvn_target_pos.z = g_z_value;
 	
 	//重置坐标轴的坐标，防止计算的误差积累
 	for (int i=0;i<6;i++)
 	{
-		g_obj.obj_coords_transformed[i] = g_obj.obj_coords[i];
+		g_obj.obj_coords_transformed[i] = vertex3d(0,0,0,0);
 	}
-	
 	
 	CameraUpdateMatrix(&g_camera);
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
-
-	
-	//g_camera.word_pos.x +=0.1f;
-	//if (g_camera.word_pos.x>5)
-	//	g_camera.word_pos.x =0;
 	ObjectCameraTransform(&g_obj,&g_camera);
-	 
 	ObjectProjectTransform(&g_obj,&g_camera);
-
 	ObjectScreenTransform(&g_obj,&g_camera);
-	ObjectDraw(&g_obj,600,400);
-	
+	ObjectDraw(&g_obj,SCREEN_WIDTH,SCREEN_HEIGHT);
 	
 	pDevice->EndScene();
 	pDevice->Present(NULL, NULL, NULL, NULL);

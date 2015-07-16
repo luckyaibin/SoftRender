@@ -191,13 +191,13 @@ void ObjectInit(Ojbect_Ptr obj)
 
 
 	obj->obj_coords[0] = vertex3d(0,0,0,ARGB(255,255,0,0));
-	obj->obj_coords[1]   = vertex3d(15,0,0,ARGB(255,255,0,0));
+	obj->obj_coords[1]   = vertex3d(150,0,0,ARGB(255,255,0,0));
 
 	obj->obj_coords[2] = vertex3d(0,0,0,ARGB(255,0,255,0));
-	obj->obj_coords[3] = vertex3d(0,15,0,ARGB(255,0,255,0));
+	obj->obj_coords[3] = vertex3d(0,150,0,ARGB(255,0,255,0));
 
 	obj->obj_coords[4] = vertex3d(0,0,0,ARGB(255,0,0,255));
-	obj->obj_coords[5] = vertex3d(0,0,15,ARGB(255,0,0,255));
+	obj->obj_coords[5] = vertex3d(0,0,150,ARGB(255,0,0,255));
 
 }
 void ObjectInit_new(Ojbect_Ptr obj)
@@ -314,9 +314,9 @@ void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 		if (v11.y < 0)
 			v11.y = 0;
 		if(v11.x>screen_w)
-			v11.x = screen_w;
+			v11.x = screen_w-1;
 		if(v11.y>screen_h)
-			v11.y = screen_h;
+			v11.y = screen_h-1;
 
 		DrawLine(v00.x,v00.y,v11.x,v11.y,v00.color);
 
@@ -444,10 +444,10 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 	}
 	for (int i=0;i<6;i++)
 	{
-		p_obj->obj_coords_transformed[i].x += p_obj->obj_coords[i].x + p_obj->world_coord.x;
-		p_obj->obj_coords_transformed[i].y += p_obj->obj_coords[i].y + p_obj->world_coord.y;
-		p_obj->obj_coords_transformed[i].z += p_obj->obj_coords[i].z + p_obj->world_coord.z;
-
+		p_obj->obj_coords_transformed[i].x = p_obj->obj_coords[i].x + p_obj->world_coord.x;
+		p_obj->obj_coords_transformed[i].y = p_obj->obj_coords[i].y + p_obj->world_coord.y;
+		p_obj->obj_coords_transformed[i].z = p_obj->obj_coords[i].z + p_obj->world_coord.z;
+		p_obj->obj_coords_transformed[i].color = p_obj->obj_coords[i].color;
 		 
 	}
 	check_obj_coord(p_obj);
@@ -580,19 +580,12 @@ void ObjectScreenTransform(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
 		v.x = p_obj->obj_coords_transformed[i].x;
 		v.y = p_obj->obj_coords_transformed[i].y;
 		v.z = p_obj->obj_coords_transformed[i].z;
-		vector3 vv_test = v;
-		check_vector3_value(v);
-
+		 
 		//Ö´ÐÐÆÁÄ»±ä»»
 		v = p_camera->matrix_screen * v;
-		
-		check_vector3_value(v);
-
-		vv_test = p_camera->matrix_screen * vv_test;
-
-
-		p_obj->obj_coords_transformed[i].x = v.x/v.z;
-		p_obj->obj_coords_transformed[i].y = v.y/v.z;
+ 
+		p_obj->obj_coords_transformed[i].x = v.x;
+		p_obj->obj_coords_transformed[i].y = v.y;
 		p_obj->obj_coords_transformed[i].z = v.z;
 
 		check_vertex3d_value(p_obj->obj_coords_transformed[i]);
