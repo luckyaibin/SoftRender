@@ -128,7 +128,7 @@ void check_vertex3d_value(vertex3d v)
 	}
 }
 
-void ObjectInit(Ojbect_Ptr obj)
+void ObjectInit__(Ojbect_Ptr obj)
 {
 	obj->world_coord = vector3(0,0,0);
 	obj->vertex_count = 4;
@@ -200,15 +200,49 @@ void ObjectInit(Ojbect_Ptr obj)
 	obj->obj_coords[5] = vertex3d(0,0,150,ARGB(255,0,0,255));
 
 }
-void ObjectInit_new(Ojbect_Ptr obj)
+void ObjectInit(Ojbect_Ptr obj)
 {
+	/*
+	(0,		0,		2)
+	(-1,	-1,		0)
+	(1,		-1,		0)
+	(0,		1,		0)
+
+	0,1,3
+	0,1,2
+	0,2,3
+	1,3,2
+
+	---------对于独立的4个不共用点的三角形
+	1:
+	(0,		0,		2)
+	(-1,	-1,		0)
+	(0,		1,		0)
+
+	2:
+	(0,		0,		2)
+	(-1,	-1,		0)
+	(1,		-1,		0)
+
+	3:
+	(0,		0,		2)
+	(1,		-1,		0)
+	(0,		1,		0)
+
+	4:
+	(-1,	-1,		0)
+	(0,		1,		0)
+	(1,		-1,		0)
+	*/
 	obj->world_coord = vector3(0,0,0);
 	obj->vertex_count = 12;
 	//obj.triangle_list[0] = 
-	vertex3d *v = new vertex3d();
+	//1:
+	vertex3d *v;
+	v = new vertex3d();
 	v->x = 0;
-	v->y = 0;
-	v->z = 2;
+	v->y = 1;
+	v->z = 0;
 	v->color = RGB(255,0,0);
 	obj->vertex_data_local[0] = *v;
 
@@ -216,56 +250,127 @@ void ObjectInit_new(Ojbect_Ptr obj)
 	v->x = -1;
 	v->y = -1;
 	v->z = 0;
-	v->color = RGB(0,255,0);
+	v->color = RGB(255,0,0);
 	obj->vertex_data_local[1] = *v;
+
+	v = new vertex3d();
+
+	v->x = 0;
+	v->y = 0;
+	v->z = 2;
+	v->color = RGB(255,0,0);
+	obj->vertex_data_local[2] = *v;
+
+	//2:
+	v = new vertex3d();
+	v->x = 0;
+	v->y = 0;
+	v->z = 2;
+	v->color = RGB(0,255,0);
+	obj->vertex_data_local[3] = *v;
+
+	v = new vertex3d();
+	v->x = -1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(0,255,0);
+	obj->vertex_data_local[4] = *v;
+
+	v = new vertex3d();
+	v->x = 1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(0,255,0);
+	obj->vertex_data_local[5] = *v;
+
+	//3:
+	v = new vertex3d();
+	v->x = 0;
+	v->y = 0;
+	v->z = 2;
+	v->color = RGB(0,0,255);
+	obj->vertex_data_local[6] = *v;
 
 	v = new vertex3d();
 	v->x = 1;
 	v->y = -1;
 	v->z = 0;
 	v->color = RGB(0,0,255);
-	obj->vertex_data_local[2] = *v;
+	obj->vertex_data_local[7] = *v;
 
 	v = new vertex3d();
 	v->x = 0;
 	v->y = 1;
 	v->z = 0;
-	v->color = RGB(0,0,100);
-	obj->vertex_data_local[3] = *v;
+	v->color = RGB(0,0,255);
+	obj->vertex_data_local[8] = *v;
 
+	//4:
+	v = new vertex3d();
+	v->x = -1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(255,255,255);
+	obj->vertex_data_local[9] = *v;
+
+	v = new vertex3d();
+	v->x = 0;
+	v->y = 1;
+	v->z = 0;
+	v->color = RGB(255,255,255);
+	obj->vertex_data_local[10] = *v;
+
+	v = new vertex3d();
+	v->x = 1;
+	v->y = -1;
+	v->z = 0;
+	v->color = RGB(255,255,255);
+	obj->vertex_data_local[11] = *v;
+
+	///////////
 	obj->triangle_count = 4;
 	Poly p;
 	p.p_parent = obj;
 	p.vertex_index[0]=0;
-	p.vertex_index[1]=3;
-	p.vertex_index[2]=1;
+	p.vertex_index[1]=1;
+	p.vertex_index[2]=2;
 	obj->triangle_list[0] = p;
 
 	p.p_parent = obj;
-	p.vertex_index[0]=0;
-	p.vertex_index[1]=1;
-	p.vertex_index[2]=2;
+	p.vertex_index[0]=3;
+	p.vertex_index[1]=4;
+	p.vertex_index[2]=5;
 	obj->triangle_list[1] = p;
 
 
 	p.p_parent = obj;
-	p.vertex_index[0]=0;
-	p.vertex_index[1]=2;
-	p.vertex_index[2]=3;
+	p.vertex_index[0]=6;
+	p.vertex_index[1]=7;
+	p.vertex_index[2]=8;
 	obj->triangle_list[2] = p;
 
 
 	p.p_parent = obj;
-	p.vertex_index[0]=1;
-	p.vertex_index[1]=3;
-	p.vertex_index[2]=2;
+	p.vertex_index[0]=9;
+	p.vertex_index[1]=10;
+	p.vertex_index[2]=11;
 	obj->triangle_list[3] = p;
+
+
+	obj->obj_coords[0] = vertex3d(0,0,0,ARGB(255,255,0,0));
+	obj->obj_coords[1]   = vertex3d(150,0,0,ARGB(255,255,0,0));
+
+	obj->obj_coords[2] = vertex3d(0,0,0,ARGB(255,0,255,0));
+	obj->obj_coords[3] = vertex3d(0,150,0,ARGB(255,0,255,0));
+
+	obj->obj_coords[4] = vertex3d(0,0,0,ARGB(255,0,0,255));
+	obj->obj_coords[5] = vertex3d(0,0,150,ARGB(255,0,0,255));
 
 }
 
 void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
 {
-	for (int i=0;i<p_obj->triangle_count;i++)
+	for (int i=p_obj->triangle_count-1;i>=0;i--)
 	{
 		Poly_Type poly = p_obj->triangle_list[i];
 		vertex3d v0 = p_obj->vertex_data_transformed[poly.vertex_index[0]];
