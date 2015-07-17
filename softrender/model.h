@@ -13,6 +13,8 @@
 
 enum TRANS_TYPE{TT_LOCAL,TT_TRANS,TT_LOCAL_TO_TRANS};
 
+enum POLY_STATE {POLY_STATE_BACKFACE = 0,POLY_STATE_ACTIVE=1};
+
 struct Object_Type;
 typedef Object_Type*  Ojbect_Ptr;
 //物体的多边形（三角形的定义）
@@ -20,6 +22,7 @@ typedef struct Poly_Type
 {
 	Ojbect_Ptr p_parent;//指向object的指针
 	int vertex_index[3];//p_triangle_list中三个顶点的索引
+	POLY_STATE state;
 	vector3 norm;
 }Poly,*Poly_Ptr;
 
@@ -384,6 +387,9 @@ void ObjectDraw(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera,int screen_w,int screen_
 
 			vector3 edget_vector1 = vector3(v1.x-v0.x,v1.y-v0.y,v1.z-v0.z);
 			vector3 edget_vector2 = vector3(v2.x-v1.x,v2.y-v1.y,v2.z-v1.z);
+			//vector3 edget_vector1(1,0,0);
+			//vector3 edget_vector2(0,1,0);
+
 			vector3 n = cross_mul(edget_vector1,edget_vector2);
 			vector3 cam_to_triangle_vector = vector3(v0.x - p_camera->world_pos.x,v0.y - p_camera->world_pos.y,v0.z - p_camera->world_pos.z );
 

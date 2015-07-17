@@ -159,7 +159,11 @@ int32_t Game_Main()
 	show_frame();
 
 	CameraUpdateMatrix(&g_camera);
+
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
+
+	ObjectDeleteBackface()
+
 	ObjectCameraTransform(&g_obj,&g_camera);
 	ObjectProjectTransform(&g_obj,&g_camera);
 	ObjectScreenTransform(&g_obj,&g_camera);
