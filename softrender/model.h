@@ -240,90 +240,90 @@ void ObjectInit(Ojbect_Ptr obj)
 	//1:
 	vertex3d *v;
 	v = new vertex3d();
-	v->x = 0;
-	v->y = 1;
-	v->z = 0;
+	v->x = 0.5f;
+	v->y = 0.5f;
+	v->z = 0.5f;
 	v->color = RGB(255,0,0);
 	obj->vertex_data_local[0] = *v;
 
 	v = new vertex3d();
-	v->x = -1;
-	v->y = -1;
-	v->z = 0;
+	v->x = -0.5f;
+	v->y = -0.5f;
+	v->z = 0.5f;
 	v->color = RGB(255,0,0);
 	obj->vertex_data_local[1] = *v;
 
 	v = new vertex3d();
 
-	v->x = 0;
-	v->y = 0;
-	v->z = 2;
+	v->x = 0.5f;
+	v->y = -0.5f;
+	v->z = -0.5f;
 	v->color = RGB(255,0,0);
 	obj->vertex_data_local[2] = *v;
 
 	//2:
 	v = new vertex3d();
-	v->x = 0;
-	v->y = 0;
-	v->z = 2;
+	v->x = 0.5f;
+	v->y = 0.5f;
+	v->z = 0.5f;
 	v->color = RGB(0,255,0);
 	obj->vertex_data_local[3] = *v;
 
 	v = new vertex3d();
-	v->x = -1;
-	v->y = -1;
-	v->z = 0;
+	v->x = 0.5f;
+	v->y = -0.5f;
+	v->z = -0.5f;
 	v->color = RGB(0,255,0);
 	obj->vertex_data_local[4] = *v;
 
 	v = new vertex3d();
-	v->x = 1;
-	v->y = -1;
-	v->z = 0;
+	v->x = -0.5f;
+	v->y = 0.5f;
+	v->z = -0.5f;
 	v->color = RGB(0,255,0);
 	obj->vertex_data_local[5] = *v;
 
 	//3:
 	v = new vertex3d();
-	v->x = 0;
-	v->y = 0;
-	v->z = 2;
+	v->x = 0.5f;
+	v->y = 0.5f;
+	v->z = 0.5f;
 	v->color = RGB(0,0,255);
 	obj->vertex_data_local[6] = *v;
 
 	v = new vertex3d();
-	v->x = 1;
-	v->y = -1;
-	v->z = 0;
+	v->x = -0.5f;
+	v->y = 0.5f;
+	v->z = -0.5f;
 	v->color = RGB(0,0,255);
 	obj->vertex_data_local[7] = *v;
 
 	v = new vertex3d();
-	v->x = 0;
-	v->y = 1;
-	v->z = 0;
+	v->x = -0.5f;
+	v->y = -0.5f;
+	v->z = 0.5f;
 	v->color = RGB(0,0,255);
 	obj->vertex_data_local[8] = *v;
 
 	//4:
 	v = new vertex3d();
-	v->x = -1;
-	v->y = -1;
-	v->z = 0;
+	v->x = 0.5f;
+	v->y = -0.5f;
+	v->z = -0.5f;
 	v->color = RGB(255,255,255);
 	obj->vertex_data_local[9] = *v;
 
 	v = new vertex3d();
-	v->x = 0;
-	v->y = 1;
-	v->z = 0;
+	v->x = -0.5f;
+	v->y = -0.5f;
+	v->z = 0.5f;
 	v->color = RGB(255,255,255);
 	obj->vertex_data_local[10] = *v;
 
 	v = new vertex3d();
-	v->x = 1;
-	v->y = -1;
-	v->z = 0;
+	v->x = -0.5f;
+	v->y = 0.5f;
+	v->z = -0.5f;
 	v->color = RGB(255,255,255);
 	obj->vertex_data_local[11] = *v;
 
@@ -358,50 +358,70 @@ void ObjectInit(Ojbect_Ptr obj)
 
 
 	obj->obj_coords[0] = vertex3d(0,0,0,ARGB(255,255,0,0));
-	obj->obj_coords[1]   = vertex3d(150,0,0,ARGB(255,255,0,0));
+	obj->obj_coords[1]   = vertex3d(1,0,0,ARGB(255,255,0,0));
 
 	obj->obj_coords[2] = vertex3d(0,0,0,ARGB(255,0,255,0));
-	obj->obj_coords[3] = vertex3d(0,150,0,ARGB(255,0,255,0));
+	obj->obj_coords[3] = vertex3d(0,1,0,ARGB(255,0,255,0));
 
 	obj->obj_coords[4] = vertex3d(0,0,0,ARGB(255,0,0,255));
-	obj->obj_coords[5] = vertex3d(0,0,150,ARGB(255,0,0,255));
+	obj->obj_coords[5] = vertex3d(0,0,1,ARGB(255,0,0,255));
 
 }
 
-void ObjectDraw(Ojbect_Ptr p_obj,int screen_w,int screen_h)
+void ObjectDraw(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera,int screen_w,int screen_h)
 {
-	for (int i=p_obj->triangle_count-1;i>=0;i--)
+	//for (int i=p_obj->triangle_count-1;i>=0;i--)
+		for (int i=0;i<p_obj->triangle_count;i++)
 	{
 		Poly_Type poly = p_obj->triangle_list[i];
 		vertex3d v0 = p_obj->vertex_data_transformed[poly.vertex_index[0]];
 		vertex3d v1 = p_obj->vertex_data_transformed[poly.vertex_index[1]];
 		vertex3d v2 = p_obj->vertex_data_transformed[poly.vertex_index[2]];
 
-		vertex2d v00,v11,v22;
-		v00.x = v0.x;
-		v00.y = v0.y;
-		v00.color = v0.color;
+		//增加表面消除判断
+		if (1)
+		{
 
-		v11.x = v1.x;
-		v11.y = v1.y;
-		v11.color = v1.color;
+			vector3 edget_vector1 = vector3(v1.x-v0.x,v1.y-v0.y,v1.z-v0.z);
+			vector3 edget_vector2 = vector3(v2.x-v1.x,v2.y-v1.y,v2.z-v1.z);
+			vector3 n = cross_mul(edget_vector1,edget_vector2);
+			vector3 cam_to_triangle_vector = vector3(v0.x - p_camera->world_pos.x,v0.y - p_camera->world_pos.y,v0.z - p_camera->world_pos.z );
 
-		v22.x = v2.x;
-		v22.y = v2.y;
-		v22.color = v2.color;
-	 	DrawTriangleWithEdgeEquation(v00,v11,v22,0);
+			float dot = n*cam_to_triangle_vector;
+			if ( dot < 0)
+			{
+				vertex2d v00,v11,v22;
+				v00.x = v0.x+0.5;
+				v00.y = v0.y+0.5;
+				v00.color = v0.color;
+
+				v11.x = v1.x;
+				v11.y = v1.y;
+				v11.color = v1.color;
+
+				v22.x = v2.x;
+				v22.y = v2.y;
+				v22.color = v2.color;
+				DrawTriangleWithEdgeEquation(v00,v11,v22,0);
+			}
+			else
+			{
+
+			}
+		}
+		
 	}
 	for (int i=0;i<3;i++)
 	{
 		vertex3d vx0 = p_obj->obj_coords_transformed[2*i];
 		vertex3d vx1 = p_obj->obj_coords_transformed[2*i+1];
 		vertex2d v00,v11;
-		v00.x = vx0.x;
-		v00.y = vx0.y;
+		v00.x = vx0.x+0.5;
+		v00.y = vx0.y+0.5;
 		v00.color = vx0.color;
 
-		v11.x = vx1.x;
-		v11.y = vx1.y;
+		v11.x = vx1.x+0.5;
+		v11.y = vx1.y+0.5;
 		v11.color = vx1.color;
 
 

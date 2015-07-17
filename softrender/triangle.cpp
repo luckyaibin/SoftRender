@@ -130,7 +130,7 @@ void DrawTriangleWithEdgeEquation(vertex2d v0,vertex2d v1,vertex2d v2,ARGB color
 	init_edge_eqn(&edge2,v2,v0);
 
 	int32_t area = edge0.C + edge1.C + edge2.C;
-	int32_t back_face_culling = 0;
+	int32_t back_face_culling = 01;
 	if (area == 0)
 	{
 		return;

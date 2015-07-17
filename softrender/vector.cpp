@@ -65,12 +65,12 @@ vector3 operator*(const Matrix3& m,const vector3& v)
 // m:4*4 x v 3*1 (µ±≥…4x1æÿ’Û£©
 vector3 operator * (Matrix4 m,vector3 v)
 {
-	vector_dump(v);
+	//vector_dump(v);
 	float x = m.m00 * v.x + m.m01 * v.y + m.m02 * v.z + m.m03;
 	float y = m.m10 * v.x + m.m11 * v.y + m.m12 * v.z + m.m13;
 	float z = m.m20 * v.x + m.m21 * v.y + m.m22 * v.z + m.m23;
 
-	float _1 = m.m00 * v.x;
+	/*float _1 = m.m00 * v.x;
 	float _2 = m.m01 * v.y;
 	float _3 = m.m02 * v.z + m.m03;
 
@@ -80,7 +80,7 @@ vector3 operator * (Matrix4 m,vector3 v)
 
 	float _7 = m.m20 * v.x;
 	float _8 = m.m21 * v.y;
-	float _9 = m.m22 * v.z + m.m23;
+	float _9 = m.m22 * v.z + m.m23;*/
 
 	return vector3(x,y,z);
 }

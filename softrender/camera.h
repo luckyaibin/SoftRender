@@ -201,10 +201,15 @@ void CameraUpdateMatrix(UVNCamera_Ptr	p_uvn_camera)
 		p_uvn_camera->u=u;
 		p_uvn_camera->v=v;
 		p_uvn_camera->n=n;
+		/*Matrix4 m4_wrong(
+		p_uvn_camera->u.x,	p_uvn_camera->v.x,	p_uvn_camera->n.x,	0,
+		p_uvn_camera->u.y,	p_uvn_camera->v.y,	p_uvn_camera->n.y,	0,
+		p_uvn_camera->u.z,	p_uvn_camera->v.z,	p_uvn_camera->n.z,	0,
+		0,					0,					0,					1);*/
 		Matrix4 m4(
-			p_uvn_camera->u.x,	p_uvn_camera->v.x,	p_uvn_camera->n.x,	0,
-			p_uvn_camera->u.y,	p_uvn_camera->v.y,	p_uvn_camera->n.y,	0,
-			p_uvn_camera->u.z,	p_uvn_camera->v.z,	p_uvn_camera->n.z,	0,
+			p_uvn_camera->u.x,	p_uvn_camera->u.y,	p_uvn_camera->u.z,	0,
+			p_uvn_camera->v.x,	p_uvn_camera->v.y,	p_uvn_camera->v.z,	0,
+			p_uvn_camera->n.x,	p_uvn_camera->n.y,	p_uvn_camera->n.z,	0,
 			0,					0,					0,					1);
 		p_uvn_camera->matrix_camera = m4*m_move;
 	}

@@ -45,7 +45,6 @@ void WaitClock()
 }
 Object g_obj;
 UVNCamera g_camera;
-vector3 g_camera_target_pos(0,0,5);
 
 ID3DXFont* g_font=0;
 int32_t Game_Init()
@@ -76,7 +75,7 @@ int32_t Game_Init()
 	vector3 init_v(0,1,0);
 	InitUVNCamera(&g_camera,
 		CT_UVN,
-		vector3(0,0,3),
+		vector3(0,0,0),
 		NULL,
 		&g_obj.world_coord,
 		&init_v,
@@ -97,17 +96,15 @@ int32_t g_drawed = 0;
  
 float g_diff = 0.1;
 
-float g_x_value = 0.0f;
-float g_y_value = 0.0f;
-float g_z_value = 5.0f;
+float g_x_value = 1.0f;
+float g_y_value = 1.0f;
+float g_z_value = 1.0f;
 
 int32_t Game_Main()
 {
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
-	pDevice->BeginScene();
- 
-	show_frame();
+	
   
 	if (KEY_DOWN('S'))
 	{
@@ -135,22 +132,38 @@ int32_t Game_Main()
 		g_z_value -= 0.01;
 	}
 
-	g_camera.uvn_target_pos.x = g_x_value;
-	g_camera.uvn_target_pos.y = g_y_value;
-	g_camera.uvn_target_pos.z = g_z_value;
+
+	if (KEY_DOWN('R'))
+	{
+		g_x_value = 1;
+		g_y_value = 1;
+		g_z_value = 1;
+	}
+
+	g_camera.world_pos.x = g_x_value;
+	g_camera.world_pos.y = g_y_value;
+	g_camera.world_pos.z = g_z_value;
 	
 	//重置坐标轴的坐标，防止计算的误差积累
 	for (int i=0;i<6;i++)
 	{
 		g_obj.obj_coords_transformed[i] = vertex3d(0,0,0,0);
 	}
-	
+	char tip_coord[200]={0};
+	sprintf(tip_coord," x:%f,y:%f,z:%f",g_x_value,g_y_value,g_z_value);
+	memset(g_FPS_str,0,sizeof(g_FPS_str));
+	strcat(&g_FPS_str[0],tip_coord);
+
+	pDevice->BeginScene();
+
+	show_frame();
+
 	CameraUpdateMatrix(&g_camera);
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
 	ObjectCameraTransform(&g_obj,&g_camera);
 	ObjectProjectTransform(&g_obj,&g_camera);
 	ObjectScreenTransform(&g_obj,&g_camera);
-	ObjectDraw(&g_obj,SCREEN_WIDTH,SCREEN_HEIGHT);
+	ObjectDraw(&g_obj,&g_camera,SCREEN_WIDTH,SCREEN_HEIGHT);
 	
 	pDevice->EndScene();
 	pDevice->Present(NULL, NULL, NULL, NULL);
