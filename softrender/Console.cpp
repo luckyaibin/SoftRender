@@ -96,9 +96,9 @@ int32_t g_drawed = 0;
  
 float g_diff = 0.1;
 
-float g_x_value = 1.0f;
-float g_y_value = 1.0f;
-float g_z_value = 1.0f;
+float g_x_value = 2.0f;
+float g_y_value = 0;
+float g_z_value = 0;
 
 int32_t Game_Main()
 {
@@ -162,7 +162,7 @@ int32_t Game_Main()
 
 	ObjectWorldTransform(&g_obj,TT_LOCAL_TO_TRANS);
 
-	ObjectDeleteBackface()
+	ObjectDeleteBackface(&g_obj,&g_camera);
 
 	ObjectCameraTransform(&g_obj,&g_camera);
 	ObjectProjectTransform(&g_obj,&g_camera);

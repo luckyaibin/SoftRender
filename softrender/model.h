@@ -374,48 +374,29 @@ void ObjectInit(Ojbect_Ptr obj)
 void ObjectDraw(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera,int screen_w,int screen_h)
 {
 	//for (int i=p_obj->triangle_count-1;i>=0;i--)
-		for (int i=0;i<p_obj->triangle_count;i++)
+	for (int i=0;i<p_obj->triangle_count;i++)
 	{
 		Poly_Type poly = p_obj->triangle_list[i];
-		vertex3d v0 = p_obj->vertex_data_transformed[poly.vertex_index[0]];
-		vertex3d v1 = p_obj->vertex_data_transformed[poly.vertex_index[1]];
-		vertex3d v2 = p_obj->vertex_data_transformed[poly.vertex_index[2]];
-
-		//增加表面消除判断
-		if (1)
+		if (poly.state == POLY_STATE_ACTIVE)
 		{
+			vertex3d v0 = p_obj->vertex_data_transformed[poly.vertex_index[0]];
+			vertex3d v1 = p_obj->vertex_data_transformed[poly.vertex_index[1]];
+			vertex3d v2 = p_obj->vertex_data_transformed[poly.vertex_index[2]];
+		 
+			vertex2d v00,v11,v22;
+			v00.x = v0.x+0.5;
+			v00.y = v0.y+0.5;
+			v00.color = v0.color;
 
-			vector3 edget_vector1 = vector3(v1.x-v0.x,v1.y-v0.y,v1.z-v0.z);
-			vector3 edget_vector2 = vector3(v2.x-v1.x,v2.y-v1.y,v2.z-v1.z);
-			//vector3 edget_vector1(1,0,0);
-			//vector3 edget_vector2(0,1,0);
+			v11.x = v1.x;
+			v11.y = v1.y;
+			v11.color = v1.color;
 
-			vector3 n = cross_mul(edget_vector1,edget_vector2);
-			vector3 cam_to_triangle_vector = vector3(v0.x - p_camera->world_pos.x,v0.y - p_camera->world_pos.y,v0.z - p_camera->world_pos.z );
-
-			float dot = n*cam_to_triangle_vector;
-			if ( dot < 0)
-			{
-				vertex2d v00,v11,v22;
-				v00.x = v0.x+0.5;
-				v00.y = v0.y+0.5;
-				v00.color = v0.color;
-
-				v11.x = v1.x;
-				v11.y = v1.y;
-				v11.color = v1.color;
-
-				v22.x = v2.x;
-				v22.y = v2.y;
-				v22.color = v2.color;
-				DrawTriangleWithEdgeEquation(v00,v11,v22,0);
-			}
-			else
-			{
-
-			}
+			v22.x = v2.x;
+			v22.y = v2.y;
+			v22.color = v2.color;
+			DrawTriangleWithEdgeEquation(v00,v11,v22,0);
 		}
-		
 	}
 	for (int i=0;i<3;i++)
 	{
@@ -429,7 +410,6 @@ void ObjectDraw(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera,int screen_w,int screen_
 		v11.x = vx1.x+0.5;
 		v11.y = vx1.y+0.5;
 		v11.color = vx1.color;
-
 
 		if(v00.x < 0 )
 			v00.x=0;
@@ -448,10 +428,7 @@ void ObjectDraw(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera,int screen_w,int screen_
 			v11.x = screen_w-1;
 		if(v11.y>screen_h)
 			v11.y = screen_h-1;
-
 		DrawLine(v00.x,v00.y,v11.x,v11.y,v00.color);
-
-
 	}
 
 }
@@ -582,6 +559,37 @@ void ObjectWorldTransform(Ojbect_Ptr p_obj,TRANS_TYPE tt)
 		 
 	}
 	check_obj_coord(p_obj);
+}
+
+//背面剔除
+void ObjectDeleteBackface(Ojbect_Ptr p_obj,UVNCamera_Ptr p_camera)
+{
+	for (int i=0;i<p_obj->triangle_count;i++)
+	{
+		Poly_Type triangle = p_obj->triangle_list[i];
+		int vertex_index_0 = triangle.vertex_index[0];
+		int vertex_index_1 = triangle.vertex_index[1];
+		int vertex_index_2 = triangle.vertex_index[2];
+
+		vertex3d v0 = p_obj->vertex_data_transformed[vertex_index_0];
+		vertex3d v1 = p_obj->vertex_data_transformed[vertex_index_1];
+		vertex3d v2 = p_obj->vertex_data_transformed[vertex_index_2];
+		
+		vector3 vec0(v0.x,v0.y,v0.z);
+		vector3 vec1(v1.x,v1.y,v1.z);
+		vector3 vec2(v2.x,v2.y,v2.z);
+
+		vector3 normal = cross_mul( (vec1 - vec0),(vec2-vec1));
+
+		vector3 trianlge_to_camera_vector = p_camera->world_pos - vec0;
+
+		float dot = normal * trianlge_to_camera_vector;
+
+		if (dot<=0)
+			p_obj->triangle_list[i].state = POLY_STATE_BACKFACE;
+		else
+			p_obj->triangle_list[i].state = POLY_STATE_ACTIVE;
+	}
 }
 
 //物体相机变换
