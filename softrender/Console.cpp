@@ -12,7 +12,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 #define SCREEN_BPP 32
-#define WAIT_TIME 30
+#define WAIT_TIME 10
 
 	// 全局变量定义
 HWND g_WindowHandle;
@@ -50,8 +50,14 @@ ID3DXFont* g_font=0;
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	AllocConsole();
-	freopen( "CONOUT$","w",stdout);
+	freopen("conin$","r",stdin);
+	freopen("conout$","w",stdout);
+	freopen("conout$","w",stderr);
+	HWND consoleHandle = GetConsoleWindow();
+	MoveWindow(consoleHandle,400,1,680,480,1);
+	printf("[software renderer] Console initialized.\n");
 
 	D3DXFONT_DESC lf;
 	ZeroMemory(&lf, sizeof(D3DXFONT_DESC));
@@ -149,10 +155,10 @@ int32_t Game_Main()
 	{
 		g_obj.obj_coords_transformed[i] = vertex3d(0,0,0,0);
 	}
-	char tip_coord[200]={0};
+	/*char tip_coord[200]={0};
 	sprintf(tip_coord," x:%f,y:%f,z:%f",g_x_value,g_y_value,g_z_value);
 	memset(g_FPS_str,0,sizeof(g_FPS_str));
-	strcat(&g_FPS_str[0],tip_coord);
+	strcat(&g_FPS_str[0],tip_coord);*/
 
 	pDevice->BeginScene();
 
