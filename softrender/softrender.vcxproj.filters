@@ -63,6 +63,12 @@
     <ClInclude Include="plane.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="crc\crc32.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="texture\texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp">
@@ -81,6 +87,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="draw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="crc\crc32.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="texture\texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

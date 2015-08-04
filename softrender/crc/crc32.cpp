@@ -92,7 +92,7 @@ unsigned int crc32_gen_table(int divide_table[256])
 	return 0;
 }
 
-unsigned int CRC32(void* msg,int msg_len)
+unsigned int CRC32(void* msg,int msg_len,unsigned int initial_effect)
 {
 	unsigned int poly=0x04C11DB7;
 	static int CRC32_DIVIDE_TABLE[256]={0};
@@ -100,7 +100,8 @@ unsigned int CRC32(void* msg,int msg_len)
 
 	char *m = (char*)msg;
 	char *cur_m = m;
-	unsigned int poly_effect = 0;
+	 
+	unsigned int poly_effect = initial_effect;
 	while (cur_m - m < msg_len)
 	{
 		unsigned int b = (*cur_m) ^ (poly_effect>>24);
@@ -108,5 +109,44 @@ unsigned int CRC32(void* msg,int msg_len)
 		poly_effect = (poly_effect << 8) ^ (new_effect);
 		cur_m++;
 	}
-	return poly_effect;
+	return poly_effect^initial_effect;
+}
+
+unsigned int get_sum_poly_others(unsigned char data)
+{
+	unsigned int sum_poly = data; 
+	sum_poly <<= 24; 
+	for(int j = 0; j < 8; j++) 
+	{ 
+		int hi = sum_poly&0x80000000; // 取得reg的最高位 
+		sum_poly <<= 1; 
+		if(hi) sum_poly = sum_poly^POLY; 
+	} 
+	return sum_poly;
+}
+
+void create_crc_table_others()
+{
+	for(int i = 0; i < 256; i++) 
+	{ 
+		crc_table[i] = get_sum_poly_others(i&0xFF); 
+	} 
+
+	for (int i=0;i<256;i++)
+	{
+		char * bit_str = get_bit_string(crc_table[i]);
+		printf("%d,%s \n",i,bit_str);
+	}
+}
+
+unsigned int CRC32_others(char *p,int len)
+{
+	unsigned int reg = 0; 
+	for(int i = 0; i < len; i++) 
+	{ 
+		reg = (reg<<8) ^ crc_table[(reg>>24)&0xFF ^ p[i]]; 
+		char * bit_str = get_bit_string(reg);
+		printf("%d,%s \n",i,bit_str);
+	} 
+	return reg;
 }

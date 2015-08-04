@@ -8,6 +8,7 @@
 #include "model.h"
 #include "../thirdparty/include/libpng/png.h"
 
+#include "texture/texture.h"
 #include "crc/crc32.h"
 
 //宏定义
@@ -118,15 +119,17 @@ int32_t Game_Main()
 
 	char * bit_str = get_bit_string(0x04C11DB7);
 	printf("%s\n",bit_str);
-	crc32_gen_table();
+	//crc32_gen_table();
 
-	char * msg = "\0wang";
-	int len = 5;
-	unsigned int crc32 = CRC32(msg,len);
+	char * msg = "wang";
+	int len = 4;
+	unsigned int crc32 = CRC32(msg,len,-1);
 
-	create_crc_table();
-	unsigned int crc32_2 = CRC32_2(msg,len);
-
+	create_crc_table_others();
+	unsigned int crc32_2 = CRC32_others(msg,len);
+ 
+	Texture t;
+	load_texture_png(&t,"test.png");
 
 	png_FILE_p fpin;
 	png_FILE_p fpout;
@@ -155,70 +158,70 @@ int32_t Game_Main()
 		exit(-1);
 	}
 
-	if ((fpout=fopen(outname,"wb"))==NULL)
-	{
-		fprintf(stderr,"不能找到输出文件 %s",outname);
-		exit(-1);
-	}
-	//初始化1
-	read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
-	write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
+	//if ((fpout=fopen(outname,"wb"))==NULL)
+	//{
+	//	fprintf(stderr,"不能找到输出文件 %s",outname);
+	//	exit(-1);
+	//}
+	////初始化1
+	//read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
+	//write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
 
-	read_info_ptr = png_create_info_struct(read_ptr);
-	end_info_ptr = png_create_info_struct(read_ptr);
+	//read_info_ptr = png_create_info_struct(read_ptr);
+	//end_info_ptr = png_create_info_struct(read_ptr);
 
-	write_info_ptr = png_create_info_struct(write_ptr);
-	write_end_info_ptr = png_create_info_struct(write_ptr);
-	//初始化2
-	png_init_io(read_ptr,fpin);
-	png_init_io(write_ptr,fpout);
+	//write_info_ptr = png_create_info_struct(write_ptr);
+	//write_end_info_ptr = png_create_info_struct(write_ptr);
+	////初始化2
+	//png_init_io(read_ptr,fpin);
+	//png_init_io(write_ptr,fpout);
 
-	png_read_info(read_ptr,read_info_ptr);
+	//png_read_info(read_ptr,read_info_ptr);
 
-	//(1)
-	//读取宽高位深颜色值
-	if ( png_get_IHDR(read_ptr,read_info_ptr,&width,&height,&bit_depth,&color_type,&interlace_type,&compression_type,&filter_type))
-	{
-		png_set_IHDR(write_ptr,write_info_ptr,width,height,bit_depth,
-			color_type,PNG_INTERLACE_NONE,compression_type,filter_type);
-	}
-	//（2）读取 chrm
-	//读取白色度信息，白、红，绿，蓝 点的 xy坐标，采用整形
-	png_fixed_point white_x,white_y,red_x,red_y,green_x,green_y,blue_x,blue_y;
-	if (png_get_cHRM_fixed(read_ptr,read_info_ptr,&white_x,&white_y,
-		&red_x,&red_y,&green_x,&green_y,&blue_x,&blue_y))
-	{
-		png_set_cHRM_fixed(write_ptr,write_info_ptr,white_x,white_y,red_x,red_y,
-			green_x,green_y,blue_x,blue_y);
-	}
-	//（3）gama
-	png_fixed_point gama;
-	if (png_get_gAMA_fixed(read_ptr,read_info_ptr,&gama))
-	{
-		png_set_gAMA_fixed(write_ptr,write_info_ptr,gama);
-	}
+	////(1)
+	////读取宽高位深颜色值
+	//if ( png_get_IHDR(read_ptr,read_info_ptr,&width,&height,&bit_depth,&color_type,&interlace_type,&compression_type,&filter_type))
+	//{
+	//	png_set_IHDR(write_ptr,write_info_ptr,width,height,bit_depth,
+	//		color_type,PNG_INTERLACE_NONE,compression_type,filter_type);
+	//}
+	////（2）读取 chrm
+	////读取白色度信息，白、红，绿，蓝 点的 xy坐标，采用整形
+	//png_fixed_point white_x,white_y,red_x,red_y,green_x,green_y,blue_x,blue_y;
+	//if (png_get_cHRM_fixed(read_ptr,read_info_ptr,&white_x,&white_y,
+	//	&red_x,&red_y,&green_x,&green_y,&blue_x,&blue_y))
+	//{
+	//	png_set_cHRM_fixed(write_ptr,write_info_ptr,white_x,white_y,red_x,red_y,
+	//		green_x,green_y,blue_x,blue_y);
+	//}
+	////（3）gama
+	//png_fixed_point gama;
+	//if (png_get_gAMA_fixed(read_ptr,read_info_ptr,&gama))
+	//{
+	//	png_set_gAMA_fixed(write_ptr,write_info_ptr,gama);
+	//}
 
-	//(4) iccp
-	png_charp name;
-	png_bytep profile;
-	png_uint_32 prolen;
-	if (png_get_iCCP(read_ptr,read_info_ptr,&name,&compression_type,&profile,&prolen))
-	{
-		png_set_iCCP(write_ptr,write_info_ptr,name,compression_type,profile,prolen);
-	}
-	//(5) srgb
-	int intent;
-	if (png_get_sRGB(read_ptr,read_info_ptr,&intent))
-	{
-		png_set_sRGB(write_ptr,write_info_ptr,intent);
-	}
-	http://blog.csdn.net/augusdi/article/details/10427879
-	//(7) PLTE
-	png_colorp palette;
-	int num_palette;
-	//if (png_get_PLTE(read_ptr))
-	{
-	}
+	////(4) iccp
+	//png_charp name;
+	//png_bytep profile;
+	//png_uint_32 prolen;
+	//if (png_get_iCCP(read_ptr,read_info_ptr,&name,&compression_type,&profile,&prolen))
+	//{
+	//	png_set_iCCP(write_ptr,write_info_ptr,name,compression_type,profile,prolen);
+	//}
+	////(5) srgb
+	//int intent;
+	//if (png_get_sRGB(read_ptr,read_info_ptr,&intent))
+	//{
+	//	png_set_sRGB(write_ptr,write_info_ptr,intent);
+	//}
+	//http://blog.csdn.net/augusdi/article/details/10427879
+	////(7) PLTE
+	//png_colorp palette;
+	//int num_palette;
+	////if (png_get_PLTE(read_ptr))
+	//{
+	//}
 
 	if (KEY_DOWN('S'))
 	{

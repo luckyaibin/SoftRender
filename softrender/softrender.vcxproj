@@ -84,6 +84,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="comm_headers.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="crc\crc32.h" />
     <ClInclude Include="draw.h" />
     <ClInclude Include="euler_rotate.h" />
     <ClInclude Include="fixepoint.h" />
@@ -92,15 +93,18 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="quaternion.h" />
+    <ClInclude Include="texture\texture.h" />
     <ClInclude Include="tool.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="crc\crc32.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrix.cpp" />
+    <ClCompile Include="texture\texture.cpp" />
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="vector.cpp" />
   </ItemGroup>

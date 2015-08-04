@@ -64,10 +64,10 @@ unsigned int crc32_gen_table()
 }
 
 
-unsigned int crc32_gen_table2()
+unsigned int crc32_gen_table2(int divide_table[256])
 {
 	unsigned int poly=0x04C11DB7;
-	int divide_table[256]={};
+	//int divide_table[256]={};
 	for (int i=0;i<=255;i++)
 	{
 		unsigned int dividen = i;
@@ -99,6 +99,27 @@ unsigned int crc32_gen_table2()
 		printf("%d,%s \n",i,bit_str);
 	}
 	return 0;
+}
+
+
+unsigned int CRC32(void* msg,int msg_len)
+{
+	unsigned int poly=0x04C11DB7;
+	static int CRC32_DIVIDE_TABLE[256]={0};
+	static int __INITIALIZER__ = crc32_gen_table2(CRC32_DIVIDE_TABLE);
+
+	char *m = (char*)msg;
+	char *cur_m = m;
+	unsigned int poly_effect = 0;
+
+	while (cur_m - m < msg_len)
+	{
+		unsigned char b = (*m) ^ (poly_effect>>24);
+		unsigned int new_effect = CRC32_DIVIDE_TABLE[b];
+		poly_effect = (poly_effect << 8) ^ (new_effect);
+		cur_m++;
+	}
+	return poly_effect;
 }
 
 #endif
