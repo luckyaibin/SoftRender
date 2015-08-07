@@ -50,12 +50,12 @@ void WaitClock()
 }
 Object g_obj;
 UVNCamera g_camera;
-
+Texture g_texture;
 ID3DXFont* g_font=0;
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+	load_texture_png(&g_texture,"test.png");
 	AllocConsole();
 	freopen("conin$","r",stdin);
 	freopen("conout$","w",stdout);
@@ -111,118 +111,37 @@ float g_x_value = 2.0f;
 float g_y_value = 0;
 float g_z_value = 0;
 
+
 int32_t Game_Main()
 {
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
 	
-
-	char * bit_str = get_bit_string(0x04C11DB7);
-	printf("%s\n",bit_str);
-	//crc32_gen_table();
-
-	char * msg = "wang";
-	int len = 4;
-	unsigned int crc32 = CRC32(msg,len,-1);
-
-	create_crc_table_others();
-	unsigned int crc32_2 = CRC32_others(msg,len);
- 
 	Texture t;
-	load_texture_png(&t,"test.png");
-
-	png_FILE_p fpin;
-	png_FILE_p fpout;
-
-	char *inname = "test.png";
-	char *outname="test_like.png";
-
-	png_structp read_ptr;
-	png_infop	read_info_ptr,end_info_ptr;
-
-	png_structp write_ptr;
-	png_infop	write_info_ptr,write_end_info_ptr;
-
-	png_bytep	row_buf;
-	png_uint_32	y;
-	int num_pass,pass;
-	png_uint_32 width,height;//宽 高
-	int bit_depth,color_type;//位深，颜色类型
-	int interlace_type,compression_type,filter_type;//扫描类型，压缩方式，滤波方式
-
-	//读
-	row_buf = NULL;
-	if ((fpin=fopen(inname,"rb")) == NULL)
+	//load_texture_png(&t,"test.png");
+	int row=0;
+	for (row=0;row<g_texture.h;)
 	{
-		fprintf(stderr,"不能找到输入文件 %s\n",inname);
-		exit(-1);
+		for (int col=0;col<g_texture.w;)
+		{
+			
+			unsigned int r;
+			unsigned int g;
+			unsigned int b;
+			unsigned int a;
+			unsigned char * row_pointer = g_texture.row_pointers[row];
+			
+			r = g_texture.row_pointers[row][4*col+0];
+			g = g_texture.row_pointers[row][4*col+1];
+			b = g_texture.row_pointers[row][4*col+2];
+			a = g_texture.row_pointers[row][4*col+3];
+			
+			DrawPixel(col,row, ARGB(a,r,g,b));
+			col += 1;
+		}
+		row++;
 	}
-
-	//if ((fpout=fopen(outname,"wb"))==NULL)
-	//{
-	//	fprintf(stderr,"不能找到输出文件 %s",outname);
-	//	exit(-1);
-	//}
-	////初始化1
-	//read_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
-	//write_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
-
-	//read_info_ptr = png_create_info_struct(read_ptr);
-	//end_info_ptr = png_create_info_struct(read_ptr);
-
-	//write_info_ptr = png_create_info_struct(write_ptr);
-	//write_end_info_ptr = png_create_info_struct(write_ptr);
-	////初始化2
-	//png_init_io(read_ptr,fpin);
-	//png_init_io(write_ptr,fpout);
-
-	//png_read_info(read_ptr,read_info_ptr);
-
-	////(1)
-	////读取宽高位深颜色值
-	//if ( png_get_IHDR(read_ptr,read_info_ptr,&width,&height,&bit_depth,&color_type,&interlace_type,&compression_type,&filter_type))
-	//{
-	//	png_set_IHDR(write_ptr,write_info_ptr,width,height,bit_depth,
-	//		color_type,PNG_INTERLACE_NONE,compression_type,filter_type);
-	//}
-	////（2）读取 chrm
-	////读取白色度信息，白、红，绿，蓝 点的 xy坐标，采用整形
-	//png_fixed_point white_x,white_y,red_x,red_y,green_x,green_y,blue_x,blue_y;
-	//if (png_get_cHRM_fixed(read_ptr,read_info_ptr,&white_x,&white_y,
-	//	&red_x,&red_y,&green_x,&green_y,&blue_x,&blue_y))
-	//{
-	//	png_set_cHRM_fixed(write_ptr,write_info_ptr,white_x,white_y,red_x,red_y,
-	//		green_x,green_y,blue_x,blue_y);
-	//}
-	////（3）gama
-	//png_fixed_point gama;
-	//if (png_get_gAMA_fixed(read_ptr,read_info_ptr,&gama))
-	//{
-	//	png_set_gAMA_fixed(write_ptr,write_info_ptr,gama);
-	//}
-
-	////(4) iccp
-	//png_charp name;
-	//png_bytep profile;
-	//png_uint_32 prolen;
-	//if (png_get_iCCP(read_ptr,read_info_ptr,&name,&compression_type,&profile,&prolen))
-	//{
-	//	png_set_iCCP(write_ptr,write_info_ptr,name,compression_type,profile,prolen);
-	//}
-	////(5) srgb
-	//int intent;
-	//if (png_get_sRGB(read_ptr,read_info_ptr,&intent))
-	//{
-	//	png_set_sRGB(write_ptr,write_info_ptr,intent);
-	//}
-	//http://blog.csdn.net/augusdi/article/details/10427879
-	////(7) PLTE
-	//png_colorp palette;
-	//int num_palette;
-	////if (png_get_PLTE(read_ptr))
-	//{
-	//}
-
+	 
 	if (KEY_DOWN('S'))
 	{
 		g_x_value += 0.01;
