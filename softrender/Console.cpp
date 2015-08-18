@@ -51,11 +51,44 @@ void WaitClock()
 Object g_obj;
 UVNCamera g_camera;
 Texture g_texture;
+
+Texture pnggrad8rgb;
+Texture pnggrad16rgb;
+Texture pnggrad16rgba;
+Texture pnggradHDrgba;
+Texture pngtest8rgba;
+Texture pngtest16rgba;
+Texture png_8_bit_rgba;
+Texture png_8_bit_colormap;
+Texture png_8_bit_gray_alpha;
 ID3DXFont* g_font=0;
 int32_t Game_Init()
 {
 	Init3DLib(g_HInstance, g_WindowHandle, SCREEN_WIDTH, SCREEN_HEIGHT);
-	load_texture_png(&g_texture,"test.png");
+	
+	//load_texture_png(&pnggrad8rgb,"../png_samples/pnggrad8rgb.png");
+	
+	//load_texture_png(&pnggrad16rgb,"../png_samples/pnggrad16rgb.png");
+
+	
+	//load_texture_png(&pnggrad16rgba,"../png_samples/pnggrad16rgba.png");
+
+	
+	//load_texture_png(&pnggradHDrgba,"../png_samples/pnggradHDrgba.png");
+
+	
+	//load_texture_png(&pngtest8rgba,"../png_samples/pngtest8rgba.png");
+
+	
+	//load_texture_png(&pngtest16rgba,"../png_samples/pngtest16rgba.png");
+
+
+
+	////////////////////////////////////////////////////////////////////
+	//load_texture_png(&png_8_bit_rgba,"../png_samples/png_8_bit_rgba.png");
+	load_texture_png(&png_8_bit_colormap,"../png_samples/png_8_bit_colormap.png");
+	//load_texture_png(&png_8_bit_gray_alpha,"../png_samples/png_8_bit_gray_alpha.png");
+
 	AllocConsole();
 	freopen("conin$","r",stdin);
 	freopen("conout$","w",stdout);
@@ -117,31 +150,20 @@ int32_t Game_Main()
 	StartClock();
 	FillSurface(ARGB(0,0,0,0));
 	
-	Texture t;
-	//load_texture_png(&t,"test.png");
-	int row=0;
-	for (row=0;row<g_texture.h;)
-	{
-		for (int col=0;col<g_texture.w;)
-		{
-			
-			unsigned int r;
-			unsigned int g;
-			unsigned int b;
-			unsigned int a;
-			unsigned char * row_pointer = g_texture.row_pointers[row];
-			
-			r = g_texture.row_pointers[row][4*col+0];
-			g = g_texture.row_pointers[row][4*col+1];
-			b = g_texture.row_pointers[row][4*col+2];
-			a = g_texture.row_pointers[row][4*col+3];
-			
-			DrawPixel(col,row, ARGB(a,r,g,b));
-			col += 1;
-		}
-		row++;
-	}
+ 
 	 
+	//draw_texture(&pnggrad8rgb);
+	//draw_texture(&pnggrad16rgb);
+	//draw_texture(&pnggrad16rgba);
+	//draw_texture(&pnggradHDrgba);
+	//draw_texture(&pngtest8rgba);
+	//draw_texture(&pngtest16rgba);
+
+
+	//draw_texture(&png_8_bit_rgba);
+	draw_texture(&png_8_bit_colormap);
+	//draw_texture(&png_8_bit_gray_alpha);
+	
 	if (KEY_DOWN('S'))
 	{
 		g_x_value += 0.01;
